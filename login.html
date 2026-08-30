@@ -288,15 +288,23 @@
 
         const result = DB.auth.register({ name, username, telegram: username, password, role: 'user', autoVerify: true });
         if (result.success) {
-            showToast(result.message);
-            switchTab('login');
-            document.getElementById('loginUser').value = username;
-            document.getElementById('loginPass').value = password;
-            alertBox.innerText = '✅ Account created! Sign in to access your User Panel.';
-            alertBox.style.background = 'rgba(16, 185, 129, 0.15)';
-            alertBox.style.borderColor = 'rgba(16, 185, 129, 0.4)';
-            alertBox.style.color = '#a7f3d0';
-            alertBox.style.display = 'block';
+            showToast("🎉 Account created successfully! Logging in...");
+            // Auto login and redirect to user dashboard
+            const loginRes = DB.auth.login(username, password, true);
+            if (loginRes.success) {
+                setTimeout(() => {
+                    redirectUserByRole(loginRes.session);
+                }, 500);
+            } else {
+                switchTab('login');
+                document.getElementById('loginUser').value = username;
+                document.getElementById('loginPass').value = password;
+                alertBox.innerText = '✅ Account created! Sign in to access your User Panel.';
+                alertBox.style.background = 'rgba(16, 185, 129, 0.15)';
+                alertBox.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+                alertBox.style.color = '#a7f3d0';
+                alertBox.style.display = 'block';
+            }
         } else {
             alertBox.innerText = '⚠️ ' + result.message;
             alertBox.style.background = 'rgba(239, 68, 68, 0.15)';

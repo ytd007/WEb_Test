@@ -2,9 +2,36 @@
    DualLink Hub & Generator - Core Application Script
    ========================================================================== */
 
-// GitHub Pages compatible URL helper
+// Clean URL helper: removes .html extension from browser address bar on GitHub Pages
 (function cleanURL() {
-    // Disabled replaceState to preserve exact relative path navigation on GitHub Pages and static hosts
+    try {
+        if (window.location.pathname.endsWith('.html')) {
+            let cleanPath = window.location.pathname.replace(/\.html$/, '');
+            if (cleanPath.endsWith('/index')) {
+                cleanPath = cleanPath.substring(0, cleanPath.lastIndexOf('/index') + 1);
+            }
+            window.history.replaceState(null, '', cleanPath + window.location.search + window.location.hash);
+        }
+    } catch (e) {
+        console.error('cleanURL error:', e);
+    }
+})();
+
+// Base URL helper: dynamically sets <base> tag so relative links resolve correctly on GitHub Pages
+(function setDynamicBaseURL() {
+    try {
+        let baseEl = document.querySelector('base');
+        if (!baseEl) {
+            baseEl = document.createElement('base');
+            document.head.prepend(baseEl);
+        }
+        let path = window.location.pathname;
+        let dir = path.substring(0, path.lastIndexOf('/') + 1);
+        if (!dir) dir = '/';
+        baseEl.href = window.location.origin + dir;
+    } catch (e) {
+        console.error('setDynamicBaseURL error:', e);
+    }
 })();
 
 // Open 4 Adsterra popup ad links + 1 Main Destination link
