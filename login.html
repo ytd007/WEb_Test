@@ -155,11 +155,7 @@
 
     function redirectUserByRole(session) {
         if (!session) return;
-        if (session.role === 'superadmin' || session.role === 'admin') {
-            window.location.href = 'admin';
-        } else {
-            window.location.href = 'user';
-        }
+        window.location.href = 'user';
     }
 
     function switchTab(mode) {
