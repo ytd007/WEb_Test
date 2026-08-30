@@ -33,9 +33,14 @@ const DEFAULT_DB = {
             userId: 'usr-admin-1',
             title: 'FitGirl Repacks - Direct',
             btnText: 'Go Video',
+            adLink1: 'https://www.profitableratecpmnetwork.com/czrmue86hu?key=d557ae6027ae3964917e57058fc35af0',
+            adLink2: 'https://www.profitableratecpmnetwork.com/czrmue86hu?key=d557ae6027ae3964917e57058fc35af0',
+            adLink3: 'https://www.profitableratecpmnetwork.com/czrmue86hu?key=d557ae6027ae3964917e57058fc35af0',
+            adLink4: 'https://www.profitableratecpmnetwork.com/czrmue86hu?key=d557ae6027ae3964917e57058fc35af0',
             adLink: 'https://www.profitableratecpmnetwork.com/czrmue86hu?key=d557ae6027ae3964917e57058fc35af0',
             mainLink: 'https://fitgirl-repacks.site',
             theme: 'crimson',
+            clicks: 0,
             createdAt: new Date().toLocaleDateString()
         }
     ]
@@ -363,7 +368,7 @@ class DatabaseManager {
         logout: () => {
             localStorage.removeItem(SESSION_KEY);
             sessionStorage.removeItem(SESSION_KEY);
-            window.location.href = 'login';
+            window.location.href = 'login.html';
         },
 
         getSession: () => {
@@ -380,18 +385,14 @@ class DatabaseManager {
             return !!session;
         },
 
-        requireAuth: (requiredRole = null) => {
+        requireAuth: () => {
             const session = localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY);
             if (!session) {
-                window.location.href = 'login';
+                window.location.href = 'login.html';
                 return null;
             }
 
             const parsed = JSON.parse(session);
-            if (requiredRole && requiredRole === 'admin' && parsed.role !== 'superadmin' && parsed.role !== 'admin') {
-                window.location.href = 'user';
-                return parsed;
-            }
             return parsed;
         },
 
@@ -451,14 +452,20 @@ class DatabaseManager {
             const currentSession = this.auth.getSession();
             const ownerId = userId || (currentSession ? currentSession.userId : 'usr-admin-1');
 
+            const primaryAd = item.adLink1 || item.adLink || '';
             const newItem = {
                 id: 'link-' + Date.now(),
                 userId: ownerId,
                 title: item.title,
                 btnText: item.btnText,
-                adLink: item.adLink,
+                adLink1: primaryAd,
+                adLink2: item.adLink2 || primaryAd,
+                adLink3: item.adLink3 || primaryAd,
+                adLink4: item.adLink4 || primaryAd,
+                adLink: primaryAd,
                 mainLink: item.mainLink,
                 theme: item.theme || 'crimson',
+                clicks: item.clicks || 0,
                 createdAt: new Date().toLocaleDateString()
             };
             db.links.unshift(newItem);
@@ -475,6 +482,19 @@ class DatabaseManager {
                 return { success: true, item: db.links[index] };
             }
             return { success: false, message: 'Item not found' };
+        },
+
+        incrementClicks: (id) => {
+            if (!id) return 0;
+            const db = this.getRawData();
+            if (!db.links) db.links = [];
+            const index = db.links.findIndex(l => l.id === id);
+            if (index !== -1) {
+                db.links[index].clicks = (db.links[index].clicks || 0) + 1;
+                this.saveRawData(db);
+                return db.links[index].clicks;
+            }
+            return 0;
         },
 
         delete: (id) => {

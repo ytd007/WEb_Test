@@ -104,7 +104,7 @@ function decodeItemFromURL(param) {
 function getShareableURL(item) {
     const origin = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
     const dataStr = encodeItemToURL(item);
-    return `${origin}/view?id=${item.id || 'page'}&data=${dataStr}`;
+    return `${origin}/view.html?id=${item.id || 'page'}&data=${dataStr}`;
 }
 
 // Generate standalone HTML template code like new.html

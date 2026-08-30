@@ -65,6 +65,14 @@
     <script src="db.js"></script>
     <script src="app.js"></script>
     <script>
+        function launchPortal(id, viewUrl, event) {
+            if (event) event.stopPropagation();
+            if (window.DB && window.DB.links && id) {
+                DB.links.incrementClicks(id);
+            }
+            window.open(viewUrl, '_blank');
+        }
+
         function renderCards(filterText = '') {
             const grid = document.getElementById('cardGrid');
             const links = getStoredLinks();
@@ -89,16 +97,19 @@
             grid.innerHTML = filtered.map(item => {
                 const viewUrl = getShareableURL(item);
                 return `
-                <div class="link-card" onclick="window.open('${viewUrl}', '_blank')" style="cursor: pointer;">
+                <div class="link-card" onclick="launchPortal('${item.id}', '${viewUrl}', event)" style="cursor: pointer;">
                     <div class="card-header" style="margin-bottom: 1.5rem;">
                         <div>
                             <div class="card-title">${escapeHTML(item.title)}</div>
-                            <span class="badge badge-${item.theme || 'crimson'}">${escapeHTML(item.theme || 'crimson')}</span>
+                            <div style="display: flex; gap: 0.4rem; align-items: center; margin-top: 0.4rem;">
+                                <span class="badge badge-${item.theme || 'crimson'}">${escapeHTML(item.theme || 'crimson')}</span>
+                                <span class="badge badge-indigo">👁️ ${item.clicks || 0}</span>
+                            </div>
                         </div>
                     </div>
 
                     <div class="card-actions">
-                        <a href="${viewUrl}" target="_blank" class="btn btn-${item.theme || 'crimson'} btn-block" style="padding: 0.9rem 1.5rem; font-size: 1rem; text-decoration: none;" onclick="event.stopPropagation();">
+                        <a href="${viewUrl}" target="_blank" class="btn btn-${item.theme || 'crimson'} btn-block" style="padding: 0.9rem 1.5rem; font-size: 1rem; text-decoration: none;" onclick="launchPortal('${item.id}', '${viewUrl}', event); return false;">
                             ▶ Open Web Page (${escapeHTML(item.btnText)})
                         </a>
                     </div>
@@ -118,7 +129,7 @@
             const session = (window.DB && window.DB.auth) ? DB.auth.getSession() : null;
 
             if (session) {
-                const dashboardUrl = 'user';
+                const dashboardUrl = 'user.html';
                 const dashboardLabel = '👤 My Dashboard';
                 const initial = (session.name || session.username || 'U').charAt(0).toUpperCase();
 
@@ -146,7 +157,7 @@
                 `;
             } else {
                 container.innerHTML = `
-                    <a href="login" class="nav-btn nav-btn-primary" style="text-decoration: none;">
+                    <a href="login.html" class="nav-btn nav-btn-primary" style="text-decoration: none;">
                         <div class="user-avatar-icon" style="width: 24px; height: 24px; font-size: 0.75rem; background: transparent; box-shadow: none;">👤</div>
                         <span>Login / Account</span>
                     </a>

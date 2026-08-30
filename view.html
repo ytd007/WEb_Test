@@ -85,11 +85,14 @@
             document.getElementById('actionBtn').className = `btn btn-${item.theme || 'crimson'} btn-block`;
             
             document.getElementById('actionBtn').addEventListener('click', function() {
+                if (window.DB && window.DB.links && item && item.id) {
+                    DB.links.incrementClicks(item.id);
+                }
                 const adLinks = [
                     item.adLink1 || item.adLink,
-                    item.adLink2,
-                    item.adLink3,
-                    item.adLink4
+                    item.adLink2 || item.adLink1 || item.adLink,
+                    item.adLink3 || item.adLink1 || item.adLink,
+                    item.adLink4 || item.adLink1 || item.adLink
                 ].filter(Boolean);
                 openFourAdsterraLinks(adLinks, item.mainLink);
             });

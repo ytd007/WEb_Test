@@ -15,7 +15,7 @@
         <div style="text-align: center; margin-bottom: 1.5rem;">
             <div class="brand-icon" style="width: 54px; height: 54px; font-size: 1.7rem; margin: 0 auto 0.85rem; background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(6,182,212,0.2)); border: 1px solid var(--border-accent);">🔒</div>
             <h2 id="cardTitle" style="font-size: 1.6rem;">DualLink Portal Sign In</h2>
-            <p id="cardSubtitle" style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0;">Access Admin or User Panel</p>
+            <p id="cardSubtitle" style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0;">Access User Dashboard</p>
         </div>
 
         <!-- Auth Navigation Tabs -->
@@ -155,7 +155,7 @@
 
     function redirectUserByRole(session) {
         if (!session) return;
-        window.location.href = 'user';
+        window.location.href = 'user.html';
     }
 
     function switchTab(mode) {
@@ -189,7 +189,7 @@
             tabLogin.classList.add('active');
             loginForm.style.display = 'block';
             cardTitle.innerText = 'DualLink Sign In';
-            cardSubtitle.innerText = 'Access Admin or User Panel';
+            cardSubtitle.innerText = 'Access User Dashboard';
         } else if (mode === 'register') {
             tabRegister.classList.add('active');
             registerForm.style.display = 'block';
