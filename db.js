@@ -120,7 +120,7 @@ class DatabaseManager {
 
     // Authentication Engine
     auth = {
-        login: (identifier, password) => {
+        login: (identifier, password, rememberMe = true) => {
             const db = this.getRawData();
             const cleanId = identifier.trim().toLowerCase();
             
@@ -142,7 +142,9 @@ class DatabaseManager {
             if (user.verified === false) {
                 return { 
                     success: false, 
-                    message: `Account (${user.telegram || user.username}) is pending Telegram verification! Please enter OTP sent to your Telegram.` 
+                    message: `Account (${user.telegram || user.username}) is pending Telegram verification! Please enter OTP sent to your Telegram.`,
+                    needsVerification: true,
+                    user: user
                 };
             }
 
@@ -151,32 +153,44 @@ class DatabaseManager {
                 username: user.username || user.telegram,
                 telegram: user.telegram || user.username,
                 name: user.name || user.username,
+                role: user.role || 'admin',
                 token: 'token-' + Math.random().toString(36).substring(2) + Date.now(),
                 loginTime: new Date().toISOString()
             };
-            localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+
+            if (rememberMe) {
+                localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+                sessionStorage.removeItem(SESSION_KEY);
+            } else {
+                sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+                localStorage.removeItem(SESSION_KEY);
+            }
             return { success: true, session };
         },
 
-        register: ({ name, telegram, password }) => {
+        register: ({ name, username, telegram, password, autoVerify = true }) => {
             const db = this.getRawData();
-            const cleanTelegram = telegram.trim();
+            const cleanUsername = (username || telegram || '').trim().toLowerCase();
+            const cleanTelegram = (telegram || username || '').trim();
+
+            if (!cleanUsername) {
+                return { success: false, message: 'Username is required!' };
+            }
 
             // Check duplicate
             const existing = db.users.find(u => 
-                (u.telegram && u.telegram.toLowerCase() === cleanTelegram.toLowerCase()) ||
-                (u.username && u.username.toLowerCase() === cleanTelegram.toLowerCase())
+                (u.username && u.username.toLowerCase() === cleanUsername) ||
+                (u.telegram && u.telegram.toLowerCase() === cleanTelegram.toLowerCase())
             );
 
             if (existing) {
                 if (existing.verified === false) {
-                    // Re-issue verification token for unverified existing user
                     existing.verifyToken = 'ver_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
                     existing.verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
                     this.saveRawData(db);
-                    return { success: true, user: existing };
+                    return { success: true, user: existing, message: 'Account exists but unverified. Verification OTP sent.' };
                 }
-                return { success: false, message: 'This Telegram username/phone is already registered!' };
+                return { success: false, message: 'This Username or Telegram handle is already registered!' };
             }
 
             const verifyToken = 'ver_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
@@ -184,20 +198,20 @@ class DatabaseManager {
 
             const newUser = {
                 id: 'usr-' + Date.now(),
-                name: name.trim(),
+                name: name ? name.trim() : cleanUsername,
                 telegram: cleanTelegram,
-                username: cleanTelegram.replace(/[@+]/g, ''),
+                username: cleanUsername.replace(/[@+]/g, ''),
                 password: password,
-                verified: false,
-                verifyToken: verifyToken,
-                verifyCode: verifyCode,
+                verified: autoVerify, // Auto-verified by default for easy admin setup
+                verifyToken: autoVerify ? null : verifyToken,
+                verifyCode: autoVerify ? null : verifyCode,
                 role: 'admin',
                 createdAt: new Date().toISOString()
             };
 
             db.users.push(newUser);
             this.saveRawData(db);
-            return { success: true, user: newUser };
+            return { success: true, user: newUser, message: autoVerify ? 'Account registered successfully!' : 'Account registered! Verification required.' };
         },
 
         verifyAccount: (tokenOrCode) => {
@@ -222,12 +236,13 @@ class DatabaseManager {
 
         logout: () => {
             localStorage.removeItem(SESSION_KEY);
+            sessionStorage.removeItem(SESSION_KEY);
             window.location.href = 'login';
         },
 
         getSession: () => {
             try {
-                const session = localStorage.getItem(SESSION_KEY);
+                const session = localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY);
                 return session ? JSON.parse(session) : null;
             } catch (e) {
                 return null;
@@ -235,12 +250,12 @@ class DatabaseManager {
         },
 
         isAuthenticated: () => {
-            const session = localStorage.getItem(SESSION_KEY);
+            const session = localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY);
             return !!session;
         },
 
         requireAuth: () => {
-            if (!localStorage.getItem(SESSION_KEY)) {
+            if (!localStorage.getItem(SESSION_KEY) && !sessionStorage.getItem(SESSION_KEY)) {
                 window.location.href = 'login';
             }
         },
@@ -258,7 +273,11 @@ class DatabaseManager {
                 
                 session.username = newUsername.trim();
                 session.telegram = newUsername.trim();
-                localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+                if (localStorage.getItem(SESSION_KEY)) {
+                    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+                } else {
+                    sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+                }
                 return { success: true };
             }
             return { success: false, message: 'User record not found.' };

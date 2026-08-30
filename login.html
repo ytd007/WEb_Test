@@ -3,75 +3,277 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - DualLink Hub</title>
+    <title>Authentication - DualLink Hub</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <div class="standalone-wrapper">
-    <div class="action-card" style="max-width: 420px; text-align: left;">
+    <div class="action-card" style="max-width: 450px; text-align: left;">
         
-        <div style="text-align: center; margin-bottom: 2rem;">
-            <div class="brand-icon" style="width: 50px; height: 50px; font-size: 1.6rem; margin: 0 auto 1rem;">🔒</div>
-            <h2>Admin Login</h2>
-            <p style="font-size: 0.9rem; color: var(--text-secondary);">Login to access the Admin Panel.</p>
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <div class="brand-icon" style="width: 54px; height: 54px; font-size: 1.7rem; margin: 0 auto 0.85rem; background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(6,182,212,0.2)); border: 1px solid var(--border-accent);">🔒</div>
+            <h2 id="cardTitle" style="font-size: 1.6rem;">Admin Authentication</h2>
+            <p id="cardSubtitle" style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0;">Access DualLink Management Portal</p>
         </div>
 
-        <div id="errorAlert" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 0.8rem 1rem; border-radius: var(--radius-md); font-size: 0.85rem; margin-bottom: 1.25rem;">
-            <!-- Error message inserted here -->
+        <!-- Auth Navigation Tabs -->
+        <div class="auth-tabs">
+            <div class="auth-tab active" id="tabLogin" onclick="switchTab('login')">🔑 Sign In</div>
+            <div class="auth-tab" id="tabRegister" onclick="switchTab('register')">✨ Register</div>
+            <div class="auth-tab" id="tabVerify" onclick="switchTab('verify')" style="display: none;">🛡️ Verify OTP</div>
         </div>
 
+        <!-- Error & Alert Banner -->
+        <div id="authAlert" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 0.8rem 1rem; border-radius: var(--radius-md); font-size: 0.85rem; margin-bottom: 1.25rem;">
+            <!-- Dynamic Alert Message -->
+        </div>
+
+        <!-- 1. LOGIN FORM -->
         <form id="loginForm" onsubmit="handleLogin(event)">
             <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="Enter username" value="admin" required autofocus>
+                <label for="loginUser">Username or Telegram Handle</label>
+                <input type="text" id="loginUser" placeholder="e.g. admin or @admin" value="admin" required autofocus>
             </div>
 
             <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter password" value="123" required>
+                <label for="loginPass">Password</label>
+                <div class="password-input-group">
+                    <input type="password" id="loginPass" placeholder="Enter password" value="123" required>
+                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('loginPass', this)" title="Show/Hide Password">👁️</button>
+                </div>
             </div>
 
-            <button type="submit" class="btn btn-indigo btn-block" style="padding: 0.85rem; font-size: 1rem; margin-top: 1rem;">
-                🔑 Sign In to Admin Panel
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; margin-bottom: 1.25rem;">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="rememberMe" checked>
+                    <span>Remember me on this browser</span>
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-indigo btn-block" style="padding: 0.85rem; font-size: 0.98rem;">
+                🚀 Sign In to Admin Panel
             </button>
         </form>
 
-        <div style="margin-top: 1.5rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-light); padding: 0.85rem 1rem; border-radius: var(--radius-md); font-size: 0.8rem; color: var(--text-muted);">
-            <div style="font-weight: 600; color: var(--text-secondary); margin-bottom: 0.2rem;">Default Admin Credentials:</div>
-            <div>Username: <code style="color: #67e8f9;">admin</code></div>
-            <div>Password: <code style="color: #67e8f9;">123</code></div>
+        <!-- 2. REGISTER FORM -->
+        <form id="registerForm" onsubmit="handleRegister(event)" style="display: none;">
+            <div class="form-group">
+                <label for="regName">Full Name</label>
+                <input type="text" id="regName" placeholder="e.g. System Administrator" required>
+            </div>
+
+            <div class="form-group">
+                <label for="regUser">Username / Telegram Handle</label>
+                <input type="text" id="regUser" placeholder="e.g. myadmin or @myadmin" required>
+            </div>
+
+            <div class="form-group">
+                <label for="regPass">New Password</label>
+                <div class="password-input-group">
+                    <input type="password" id="regPass" placeholder="Create strong password" oninput="checkPasswordStrength(this.value)" required>
+                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('regPass', this)" title="Show/Hide Password">👁️</button>
+                </div>
+                <div class="password-strength-meter">
+                    <div id="strengthFill" class="password-strength-fill"></div>
+                </div>
+                <div id="strengthText" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; text-align: right;">Password strength</div>
+            </div>
+
+            <button type="submit" class="btn btn-indigo btn-block" style="padding: 0.85rem; font-size: 0.98rem; margin-top: 1rem;">
+                ✨ Create Admin Account
+            </button>
+        </form>
+
+        <!-- 3. VERIFY OTP FORM -->
+        <form id="verifyForm" onsubmit="handleVerify(event)" style="display: none;">
+            <div class="form-group">
+                <label for="verifyCode">Telegram Verification Code / Token</label>
+                <input type="text" id="verifyCode" placeholder="Enter 6-digit OTP code" style="letter-spacing: 2px; font-weight: bold; text-align: center; font-size: 1.1rem;" required>
+            </div>
+            <button type="submit" class="btn btn-indigo btn-block" style="padding: 0.85rem; font-size: 0.98rem; margin-top: 1rem;">
+                🛡️ Verify Account
+            </button>
+        </form>
+
+        <!-- Quick Credentials Chip for Demo -->
+        <div style="margin-top: 1.5rem; text-align: center;">
+            <div class="quick-cred-chip" onclick="autoFillCredentials()" title="Click to auto-fill default admin credentials">
+                <span>⚡ Default Credentials:</span>
+                <code style="color: #ffffff; font-weight: bold;">admin</code> / <code style="color: #ffffff; font-weight: bold;">123</code>
+            </div>
         </div>
 
-        <div style="text-align: center; margin-top: 1.5rem;">
-            <a href="./" style="font-size: 0.85rem; color: var(--text-muted);">← Back to Home Page</a>
+        <div style="text-align: center; margin-top: 1.5rem; border-top: 1px solid var(--border-light); padding-top: 1.25rem;">
+            <a href="./" style="font-size: 0.85rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.3rem;">
+                ← Back to Home Page
+            </a>
         </div>
     </div>
 </div>
 
+<!-- Toast Notification Container -->
+<div id="toast" class="toast">Notification Message</div>
+
 <script src="db.js"></script>
 <script src="app.js"></script>
 <script>
-    // Redirect if already logged in
+    // Redirect if already authenticated
     if (DB.auth.isAuthenticated()) {
         window.location.href = 'admin';
     }
 
+    function switchTab(mode) {
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const verifyForm = document.getElementById('verifyForm');
+        
+        const tabLogin = document.getElementById('tabLogin');
+        const tabRegister = document.getElementById('tabRegister');
+        const tabVerify = document.getElementById('tabVerify');
+
+        const cardTitle = document.getElementById('cardTitle');
+        const cardSubtitle = document.getElementById('cardSubtitle');
+        const authAlert = document.getElementById('authAlert');
+
+        authAlert.style.display = 'none';
+
+        tabLogin.classList.remove('active');
+        tabRegister.classList.remove('active');
+        tabVerify.classList.remove('active');
+
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'none';
+        verifyForm.style.display = 'none';
+
+        if (mode === 'login') {
+            tabLogin.classList.add('active');
+            loginForm.style.display = 'block';
+            cardTitle.innerText = 'Admin Sign In';
+            cardSubtitle.innerText = 'Welcome back! Log in to manage DualLink Hub.';
+        } else if (mode === 'register') {
+            tabRegister.classList.add('active');
+            registerForm.style.display = 'block';
+            cardTitle.innerText = 'Create Account';
+            cardSubtitle.innerText = 'Register a new administrator account.';
+        } else if (mode === 'verify') {
+            tabVerify.style.display = 'block';
+            tabVerify.classList.add('active');
+            verifyForm.style.display = 'block';
+            cardTitle.innerText = 'Verify Telegram OTP';
+            cardSubtitle.innerText = 'Enter OTP code sent to your Telegram account.';
+        }
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+        const input = document.getElementById(inputId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            btn.innerText = '🙈';
+        } else {
+            input.type = 'password';
+            btn.innerText = '👁️';
+        }
+    }
+
+    function checkPasswordStrength(password) {
+        const fill = document.getElementById('strengthFill');
+        const text = document.getElementById('strengthText');
+        fill.className = 'password-strength-fill';
+
+        if (!password) {
+            text.innerText = 'Password strength';
+            return;
+        }
+
+        if (password.length < 4) {
+            fill.classList.add('weak');
+            text.innerText = 'Weak password';
+            text.style.color = '#fca5a5';
+        } else if (password.length < 8) {
+            fill.classList.add('medium');
+            text.innerText = 'Medium strength';
+            text.style.color = '#fcd34d';
+        } else {
+            fill.classList.add('strong');
+            text.innerText = 'Strong password';
+            text.style.color = '#6ee7b7';
+        }
+    }
+
+    function autoFillCredentials() {
+        switchTab('login');
+        document.getElementById('loginUser').value = 'admin';
+        document.getElementById('loginPass').value = '123';
+        showToast("Auto-filled default admin credentials!");
+    }
+
     function handleLogin(event) {
         event.preventDefault();
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const errorAlert = document.getElementById('errorAlert');
+        const username = document.getElementById('loginUser').value;
+        const password = document.getElementById('loginPass').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+        const alertBox = document.getElementById('authAlert');
 
-        const result = DB.auth.login(username, password);
+        const result = DB.auth.login(username, password, rememberMe);
         if (result.success) {
-            showToast("Login successful! Redirecting...");
+            alertBox.style.display = 'none';
+            showToast("Login successful! Redirecting to Admin Panel...");
             setTimeout(() => {
                 window.location.href = 'admin';
-            }, 500);
+            }, 600);
         } else {
-            errorAlert.innerText = '⚠️ ' + result.message;
-            errorAlert.style.display = 'block';
+            if (result.needsVerification) {
+                switchTab('verify');
+                alertBox.innerText = '⚠️ ' + result.message;
+                alertBox.style.display = 'block';
+            } else {
+                alertBox.innerText = '⚠️ ' + result.message;
+                alertBox.style.display = 'block';
+            }
+        }
+    }
+
+    function handleRegister(event) {
+        event.preventDefault();
+        const name = document.getElementById('regName').value;
+        const username = document.getElementById('regUser').value;
+        const password = document.getElementById('regPass').value;
+        const alertBox = document.getElementById('authAlert');
+
+        const result = DB.auth.register({ name, username, telegram: username, password, autoVerify: true });
+        if (result.success) {
+            showToast(result.message);
+            switchTab('login');
+            document.getElementById('loginUser').value = username;
+            document.getElementById('loginPass').value = password;
+            alertBox.innerText = '✅ Account created! Click Sign In to access.';
+            alertBox.style.background = 'rgba(16, 185, 129, 0.15)';
+            alertBox.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+            alertBox.style.color = '#a7f3d0';
+            alertBox.style.display = 'block';
+        } else {
+            alertBox.innerText = '⚠️ ' + result.message;
+            alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
+            alertBox.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+            alertBox.style.color = '#fca5a5';
+            alertBox.style.display = 'block';
+        }
+    }
+
+    function handleVerify(event) {
+        event.preventDefault();
+        const code = document.getElementById('verifyCode').value;
+        const alertBox = document.getElementById('authAlert');
+
+        const result = DB.auth.verifyAccount(code);
+        if (result.success) {
+            showToast("Account verified successfully! Please Sign In.");
+            switchTab('login');
+        } else {
+            alertBox.innerText = '⚠️ ' + result.message;
+            alertBox.style.display = 'block';
         }
     }
 </script>

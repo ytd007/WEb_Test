@@ -576,9 +576,12 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            DB.auth.requireAuth();
             const session = DB.auth.getSession();
             if (session) {
-                document.getElementById('sessionUser').innerText = session.username;
+                const userLabel = (session.name || session.username || 'Admin');
+                const roleBadge = session.role ? ` (${session.role})` : '';
+                document.getElementById('sessionUser').innerText = userLabel + roleBadge;
             }
             updatePreview();
             renderTable();
