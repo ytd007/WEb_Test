@@ -156,6 +156,7 @@
             const session = (window.DB && window.DB.auth) ? DB.auth.getSession() : null;
 
             if (session) {
+                const dashboardUrl = 'user.html';
                 const dashboardLabel = '👤 My Dashboard';
                 const initial = (session.name || session.username || 'U').charAt(0).toUpperCase();
 
@@ -172,9 +173,9 @@
                                 <div class="user-dropdown-name">${escapeHTML(session.name || session.username)}</div>
                                 <div class="user-dropdown-role">${escapeHTML(session.role || 'user')}</div>
                             </div>
-                            <button onclick="window.location.href='user.html'" class="user-dropdown-item">
+                            <a href="${dashboardUrl}" class="user-dropdown-item">
                                 ${dashboardLabel}
-                            </button>
+                            </a>
                             <button onclick="DB.auth.logout()" class="user-dropdown-item danger">
                                 🔒 Logout
                             </button>

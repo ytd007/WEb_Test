@@ -469,62 +469,10 @@
             }
         }
 
-        function renderUserNav() {
-            const container = document.getElementById('navUserArea');
-            if (!container) return;
-
-            const session = (window.DB && window.DB.auth) ? DB.auth.getSession() : null;
-
-            if (session) {
-                const dashboardLabel = '👤 My Dashboard';
-                const initial = (session.name || session.username || 'U').charAt(0).toUpperCase();
-
-                container.innerHTML = `
-                    <div class="user-profile-menu">
-                        <button class="user-profile-btn" onclick="toggleUserDropdown(event)" id="userProfileBtn" title="User Profile">
-                            <div class="user-avatar-icon">${initial}</div>
-                            <span>${escapeHTML(session.name || session.username)}</span>
-                            <span style="font-size: 0.75rem; opacity: 0.7;">▼</span>
-                        </button>
-
-                        <div class="user-dropdown" id="userDropdown">
-                            <div class="user-dropdown-header">
-                                <div class="user-dropdown-name">${escapeHTML(session.name || session.username)}</div>
-                                <div class="user-dropdown-role">${escapeHTML(session.role || 'user')}</div>
-                            </div>
-                            <button onclick="window.location.href='user.html'" class="user-dropdown-item">
-                                ${dashboardLabel}
-                            </button>
-                            <button onclick="DB.auth.logout()" class="user-dropdown-item danger">
-                                🔒 Logout
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        function toggleUserDropdown(event) {
-            event.stopPropagation();
-            const dropdown = document.getElementById('userDropdown');
-            const btn = document.getElementById('userProfileBtn');
-            if (dropdown) dropdown.classList.toggle('show');
-            if (btn) btn.classList.toggle('active');
-        }
-
-        document.addEventListener('click', function(e) {
-            const dropdown = document.getElementById('userDropdown');
-            const btn = document.getElementById('userProfileBtn');
-            if (dropdown && !dropdown.contains(e.target) && btn && !btn.contains(e.target)) {
-                dropdown.classList.remove('show');
-                btn.classList.remove('active');
-            }
-        });
-
         document.addEventListener('DOMContentLoaded', () => {
             currentSession = DB.auth.requireAuth();
             if (currentSession) {
-                renderUserNav();
+                document.getElementById('sessionUser').innerText = currentSession.name || currentSession.username;
                 renderUserTable();
                 updatePreview();
             }
