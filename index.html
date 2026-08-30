@@ -81,7 +81,25 @@
 
         function renderCards(filterText = '') {
             const grid = document.getElementById('cardGrid');
-            const links = getStoredLinks();
+            const session = (window.DB && window.DB.auth) ? DB.auth.getSession() : null;
+            
+            if (!session) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1; padding: 3.5rem 1.5rem; background: var(--bg-card); border-radius: var(--radius-xl); border: 1px solid var(--border-light); backdrop-filter: blur(16px);">
+                        <div class="empty-icon" style="font-size: 3.5rem; margin-bottom: 1rem; opacity: 0.9;">🔒</div>
+                        <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-primary);">Sign In Required</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.75rem; max-width: 480px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+                            Available Web Portals නැරඹීමට සහ ඔබේ Portals සාදා ගැනීමට කරුණාකර ප්‍රථමයෙන් Account එකට Sign In වන්න.
+                        </p>
+                        <a href="login.html" class="btn btn-indigo" style="display: inline-flex; text-decoration: none; padding: 0.85rem 2rem; font-size: 1rem;">
+                            🔑 Sign In / Access Account
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            const links = DB.links.getAll(session.userId);
             
             const filtered = links.filter(item => 
                 item.title.toLowerCase().includes(filterText.toLowerCase()) ||
@@ -91,10 +109,13 @@
 
             if (filtered.length === 0) {
                 grid.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1 / -1;">
-                        <div class="empty-icon">📭</div>
-                        <h3>No Portals Found</h3>
-                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">No web portals available at the moment.</p>
+                    <div class="empty-state" style="grid-column: 1 / -1; padding: 3rem 1.5rem; background: var(--bg-card); border-radius: var(--radius-xl); border: 1px solid var(--border-light);">
+                        <div class="empty-icon" style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+                        <h3 style="font-size: 1.3rem;">No Portals Found</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem; margin-bottom: 1.25rem;">ඔබ තවමත් Portals සාදා නැත.</p>
+                        <a href="user.html" class="btn btn-indigo" style="display: inline-flex; text-decoration: none; padding: 0.7rem 1.5rem; font-size: 0.9rem;">
+                            ➕ Create New Portal
+                        </a>
                     </div>
                 `;
                 return;

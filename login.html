@@ -22,7 +22,6 @@
         <div class="auth-tabs">
             <div class="auth-tab active" id="tabLogin" onclick="switchTab('login')">🔑 Sign In</div>
             <div class="auth-tab" id="tabRegister" onclick="switchTab('register')">✨ Register</div>
-            <div class="auth-tab" id="tabRecover" onclick="switchTab('recover')">🆘 Recover 2FA</div>
             <div class="auth-tab" id="tabTotp" onclick="switchTab('totp')" style="display: none;">🛡️ 2FA Check</div>
         </div>
 
@@ -51,7 +50,6 @@
                     <input type="checkbox" id="rememberMe" checked>
                     <span>Remember me</span>
                 </label>
-                <a href="#" onclick="switchTab('recover'); return false;" style="font-size: 0.82rem; color: #a5b4fc;">Lost 2FA / Recover?</a>
             </div>
 
             <button type="submit" class="btn btn-indigo btn-block" style="padding: 0.85rem; font-size: 0.98rem;">
@@ -175,10 +173,10 @@
 
         alertBox.style.display = 'none';
 
-        tabLogin.classList.remove('active');
-        tabRegister.classList.remove('active');
-        tabRecover.classList.remove('active');
-        tabTotp.classList.remove('active');
+        if (tabLogin) tabLogin.classList.remove('active');
+        if (tabRegister) tabRegister.classList.remove('active');
+        if (tabRecover) tabRecover.classList.remove('active');
+        if (tabTotp) tabTotp.classList.remove('active');
 
         loginForm.style.display = 'none';
         registerForm.style.display = 'none';
