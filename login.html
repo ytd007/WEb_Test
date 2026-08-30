@@ -95,30 +95,6 @@
             <button type="submit" class="btn btn-indigo btn-block" style="padding: 0.85rem; font-size: 0.98rem; margin-top: 1rem;">
                 🛡️ Verify & Continue
             </button>
-            <div style="text-align: center; margin-top: 0.85rem;">
-                <a href="#" onclick="switchTab('recover'); return false;" style="font-size: 0.82rem; color: #fcd34d;">Lost Authenticator? Recover with Backup Code</a>
-            </div>
-        </form>
-
-        <!-- 4. ACCOUNT RECOVERY FORM -->
-        <form id="recoverForm" onsubmit="handleAccountRecovery(event)" style="display: none;">
-            <div style="margin-bottom: 1rem; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3); padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.82rem; color: #a5b4fc;">
-                🔑 Enter your Username and one of your 8-digit Emergency Backup Recovery Codes to reset 2FA and access your account.
-            </div>
-
-            <div class="form-group">
-                <label for="recoverUser">Username</label>
-                <input type="text" id="recoverUser" placeholder="e.g. admin or myuser" required>
-            </div>
-
-            <div class="form-group">
-                <label for="recoverCode">8-Digit Emergency Recovery Code</label>
-                <input type="text" id="recoverCode" placeholder="e.g. 84920193" maxlength="12" style="letter-spacing: 2px; font-weight: bold; text-align: center; font-size: 1.1rem;" required>
-            </div>
-
-            <button type="submit" class="btn btn-indigo btn-block" style="padding: 0.85rem; font-size: 0.98rem; margin-top: 1rem;">
-                🔓 Recover Account & Reset 2FA
-            </button>
         </form>
 
         <!-- Quick Credentials Chip -->
