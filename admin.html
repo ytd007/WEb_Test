@@ -573,8 +573,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            DB.auth.requireAuth();
-            const session = DB.auth.getSession();
+            const session = DB.auth.requireAuth('admin');
             if (session) {
                 const userLabel = (session.name || session.username || 'Admin');
                 const roleBadge = session.role ? ` (${session.role})` : '';

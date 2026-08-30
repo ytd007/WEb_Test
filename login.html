@@ -3,26 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Authentication - DualLink Hub</title>
+    <title>Authentication & Recovery - DualLink Hub</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <div class="standalone-wrapper">
-    <div class="action-card" style="max-width: 450px; text-align: left;">
+    <div class="action-card" style="max-width: 460px; text-align: left;">
         
         <!-- Header -->
         <div style="text-align: center; margin-bottom: 1.5rem;">
             <div class="brand-icon" style="width: 54px; height: 54px; font-size: 1.7rem; margin: 0 auto 0.85rem; background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(6,182,212,0.2)); border: 1px solid var(--border-accent);">🔒</div>
-            <h2 id="cardTitle" style="font-size: 1.6rem;">Admin Authentication</h2>
-            <p id="cardSubtitle" style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0;">Access DualLink Management Portal</p>
+            <h2 id="cardTitle" style="font-size: 1.6rem;">DualLink Portal Sign In</h2>
+            <p id="cardSubtitle" style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0;">Access Admin or User Panel</p>
         </div>
 
         <!-- Auth Navigation Tabs -->
         <div class="auth-tabs">
             <div class="auth-tab active" id="tabLogin" onclick="switchTab('login')">🔑 Sign In</div>
             <div class="auth-tab" id="tabRegister" onclick="switchTab('register')">✨ Register</div>
-            <div class="auth-tab" id="tabVerify" onclick="switchTab('verify')" style="display: none;">🛡️ Verify OTP</div>
+            <div class="auth-tab" id="tabRecover" onclick="switchTab('recover')">🆘 Recover 2FA</div>
+            <div class="auth-tab" id="tabTotp" onclick="switchTab('totp')" style="display: none;">🛡️ 2FA Check</div>
         </div>
 
         <!-- Error & Alert Banner -->
@@ -34,7 +35,7 @@
         <form id="loginForm" onsubmit="handleLogin(event)">
             <div class="form-group">
                 <label for="loginUser">Username or Telegram Handle</label>
-                <input type="text" id="loginUser" placeholder="e.g. admin or @admin" value="admin" required autofocus>
+                <input type="text" id="loginUser" placeholder="e.g. admin or myuser" value="admin" required autofocus>
             </div>
 
             <div class="form-group">
@@ -48,12 +49,13 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; margin-bottom: 1.25rem;">
                 <label class="checkbox-label">
                     <input type="checkbox" id="rememberMe" checked>
-                    <span>Remember me on this browser</span>
+                    <span>Remember me</span>
                 </label>
+                <a href="#" onclick="switchTab('recover'); return false;" style="font-size: 0.82rem; color: #a5b4fc;">Lost 2FA / Recover?</a>
             </div>
 
             <button type="submit" class="btn btn-indigo btn-block" style="padding: 0.85rem; font-size: 0.98rem;">
-                🚀 Sign In to Admin Panel
+                🚀 Sign In
             </button>
         </form>
 
@@ -61,18 +63,18 @@
         <form id="registerForm" onsubmit="handleRegister(event)" style="display: none;">
             <div class="form-group">
                 <label for="regName">Full Name</label>
-                <input type="text" id="regName" placeholder="e.g. System Administrator" required>
+                <input type="text" id="regName" placeholder="e.g. John Doe" required>
             </div>
 
             <div class="form-group">
-                <label for="regUser">Username / Telegram Handle</label>
-                <input type="text" id="regUser" placeholder="e.g. myadmin or @myadmin" required>
+                <label for="regUser">Username</label>
+                <input type="text" id="regUser" placeholder="e.g. myuser or @myuser" required>
             </div>
 
             <div class="form-group">
-                <label for="regPass">New Password</label>
+                <label for="regPass">Password</label>
                 <div class="password-input-group">
-                    <input type="password" id="regPass" placeholder="Create strong password" oninput="checkPasswordStrength(this.value)" required>
+                    <input type="password" id="regPass" placeholder="Create password" oninput="checkPasswordStrength(this.value)" required>
                     <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('regPass', this)" title="Show/Hide Password">👁️</button>
                 </div>
                 <div class="password-strength-meter">
@@ -82,25 +84,49 @@
             </div>
 
             <button type="submit" class="btn btn-indigo btn-block" style="padding: 0.85rem; font-size: 0.98rem; margin-top: 1rem;">
-                ✨ Create Admin Account
+                ✨ Create User Account
             </button>
         </form>
 
-        <!-- 3. VERIFY OTP FORM -->
-        <form id="verifyForm" onsubmit="handleVerify(event)" style="display: none;">
+        <!-- 3. 2FA TOTP CHECK FORM -->
+        <form id="totpForm" onsubmit="handleTOTPCheck(event)" style="display: none;">
             <div class="form-group">
-                <label for="verifyCode">Telegram Verification Code / Token</label>
-                <input type="text" id="verifyCode" placeholder="Enter 6-digit OTP code" style="letter-spacing: 2px; font-weight: bold; text-align: center; font-size: 1.1rem;" required>
+                <label for="totpInput">Google Authenticator 6-Digit Code</label>
+                <input type="text" id="totpInput" placeholder="Enter 6-digit TOTP code" maxlength="8" style="letter-spacing: 3px; font-weight: bold; text-align: center; font-size: 1.2rem;" required autofocus>
             </div>
             <button type="submit" class="btn btn-indigo btn-block" style="padding: 0.85rem; font-size: 0.98rem; margin-top: 1rem;">
-                🛡️ Verify Account
+                🛡️ Verify & Continue
+            </button>
+            <div style="text-align: center; margin-top: 0.85rem;">
+                <a href="#" onclick="switchTab('recover'); return false;" style="font-size: 0.82rem; color: #fcd34d;">Lost Authenticator? Recover with Backup Code</a>
+            </div>
+        </form>
+
+        <!-- 4. ACCOUNT RECOVERY FORM -->
+        <form id="recoverForm" onsubmit="handleAccountRecovery(event)" style="display: none;">
+            <div style="margin-bottom: 1rem; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3); padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.82rem; color: #a5b4fc;">
+                🔑 Enter your Username and one of your 8-digit Emergency Backup Recovery Codes to reset 2FA and access your account.
+            </div>
+
+            <div class="form-group">
+                <label for="recoverUser">Username</label>
+                <input type="text" id="recoverUser" placeholder="e.g. admin or myuser" required>
+            </div>
+
+            <div class="form-group">
+                <label for="recoverCode">8-Digit Emergency Recovery Code</label>
+                <input type="text" id="recoverCode" placeholder="e.g. 84920193" maxlength="12" style="letter-spacing: 2px; font-weight: bold; text-align: center; font-size: 1.1rem;" required>
+            </div>
+
+            <button type="submit" class="btn btn-indigo btn-block" style="padding: 0.85rem; font-size: 0.98rem; margin-top: 1rem;">
+                🔓 Recover Account & Reset 2FA
             </button>
         </form>
 
-        <!-- Quick Credentials Chip for Demo -->
+        <!-- Quick Credentials Chip -->
         <div style="margin-top: 1.5rem; text-align: center;">
             <div class="quick-cred-chip" onclick="autoFillCredentials()" title="Click to auto-fill default admin credentials">
-                <span>⚡ Default Credentials:</span>
+                <span>⚡ Default Admin:</span>
                 <code style="color: #ffffff; font-weight: bold;">admin</code> / <code style="color: #ffffff; font-weight: bold;">123</code>
             </div>
         </div>
@@ -113,56 +139,77 @@
     </div>
 </div>
 
-<!-- Toast Notification Container -->
+<!-- Toast Container -->
 <div id="toast" class="toast">Notification Message</div>
 
 <script src="db.js"></script>
 <script src="app.js"></script>
 <script>
-    // Redirect if already authenticated
+    let pendingLogin = null;
+
+    // Auto redirect if already authenticated
     if (DB.auth.isAuthenticated()) {
-        window.location.href = 'admin';
+        const session = DB.auth.getSession();
+        redirectUserByRole(session);
+    }
+
+    function redirectUserByRole(session) {
+        if (!session) return;
+        if (session.role === 'superadmin' || session.role === 'admin') {
+            window.location.href = 'admin';
+        } else {
+            window.location.href = 'user';
+        }
     }
 
     function switchTab(mode) {
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
-        const verifyForm = document.getElementById('verifyForm');
+        const totpForm = document.getElementById('totpForm');
+        const recoverForm = document.getElementById('recoverForm');
         
         const tabLogin = document.getElementById('tabLogin');
         const tabRegister = document.getElementById('tabRegister');
-        const tabVerify = document.getElementById('tabVerify');
+        const tabRecover = document.getElementById('tabRecover');
+        const tabTotp = document.getElementById('tabTotp');
 
         const cardTitle = document.getElementById('cardTitle');
         const cardSubtitle = document.getElementById('cardSubtitle');
-        const authAlert = document.getElementById('authAlert');
+        const alertBox = document.getElementById('authAlert');
 
-        authAlert.style.display = 'none';
+        alertBox.style.display = 'none';
 
         tabLogin.classList.remove('active');
         tabRegister.classList.remove('active');
-        tabVerify.classList.remove('active');
+        tabRecover.classList.remove('active');
+        tabTotp.classList.remove('active');
 
         loginForm.style.display = 'none';
         registerForm.style.display = 'none';
-        verifyForm.style.display = 'none';
+        totpForm.style.display = 'none';
+        recoverForm.style.display = 'none';
 
         if (mode === 'login') {
             tabLogin.classList.add('active');
             loginForm.style.display = 'block';
-            cardTitle.innerText = 'Admin Sign In';
-            cardSubtitle.innerText = 'Welcome back! Log in to manage DualLink Hub.';
+            cardTitle.innerText = 'DualLink Sign In';
+            cardSubtitle.innerText = 'Access Admin or User Panel';
         } else if (mode === 'register') {
             tabRegister.classList.add('active');
             registerForm.style.display = 'block';
             cardTitle.innerText = 'Create Account';
-            cardSubtitle.innerText = 'Register a new administrator account.';
-        } else if (mode === 'verify') {
-            tabVerify.style.display = 'block';
-            tabVerify.classList.add('active');
-            verifyForm.style.display = 'block';
-            cardTitle.innerText = 'Verify Telegram OTP';
-            cardSubtitle.innerText = 'Enter OTP code sent to your Telegram account.';
+            cardSubtitle.innerText = 'Register a new user account.';
+        } else if (mode === 'totp') {
+            tabTotp.style.display = 'block';
+            tabTotp.classList.add('active');
+            totpForm.style.display = 'block';
+            cardTitle.innerText = 'Google Authenticator 2FA';
+            cardSubtitle.innerText = 'Enter 6-digit code from your Authenticator App';
+        } else if (mode === 'recover') {
+            tabRecover.classList.add('active');
+            recoverForm.style.display = 'block';
+            cardTitle.innerText = 'Account Recovery';
+            cardSubtitle.innerText = 'Reset 2FA using Emergency Recovery Code';
         }
     }
 
@@ -219,19 +266,46 @@
         const result = DB.auth.login(username, password, rememberMe);
         if (result.success) {
             alertBox.style.display = 'none';
-            showToast("Login successful! Redirecting to Admin Panel...");
+            showToast("Login successful!");
             setTimeout(() => {
-                window.location.href = 'admin';
-            }, 600);
+                redirectUserByRole(result.session);
+            }, 500);
+        } else if (result.requires2FA) {
+            pendingLogin = { username, password, rememberMe };
+            switchTab('totp');
+            alertBox.innerText = '🛡️ Google Authenticator 2FA code required.';
+            alertBox.style.background = 'rgba(99, 102, 241, 0.15)';
+            alertBox.style.borderColor = 'rgba(99, 102, 241, 0.4)';
+            alertBox.style.color = '#a5b4fc';
+            alertBox.style.display = 'block';
         } else {
-            if (result.needsVerification) {
-                switchTab('verify');
-                alertBox.innerText = '⚠️ ' + result.message;
-                alertBox.style.display = 'block';
-            } else {
-                alertBox.innerText = '⚠️ ' + result.message;
-                alertBox.style.display = 'block';
-            }
+            alertBox.innerText = '⚠️ ' + result.message;
+            alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
+            alertBox.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+            alertBox.style.color = '#fca5a5';
+            alertBox.style.display = 'block';
+        }
+    }
+
+    function handleTOTPCheck(event) {
+        event.preventDefault();
+        if (!pendingLogin) {
+            switchTab('login');
+            return;
+        }
+
+        const code = document.getElementById('totpInput').value.trim();
+        const alertBox = document.getElementById('authAlert');
+
+        const result = DB.auth.login(pendingLogin.username, pendingLogin.password, pendingLogin.rememberMe, code);
+        if (result.success) {
+            showToast("2FA verified! Logging in...");
+            setTimeout(() => {
+                redirectUserByRole(result.session);
+            }, 500);
+        } else {
+            alertBox.innerText = '⚠️ ' + result.message;
+            alertBox.style.display = 'block';
         }
     }
 
@@ -242,13 +316,13 @@
         const password = document.getElementById('regPass').value;
         const alertBox = document.getElementById('authAlert');
 
-        const result = DB.auth.register({ name, username, telegram: username, password, autoVerify: true });
+        const result = DB.auth.register({ name, username, telegram: username, password, role: 'user', autoVerify: true });
         if (result.success) {
             showToast(result.message);
             switchTab('login');
             document.getElementById('loginUser').value = username;
             document.getElementById('loginPass').value = password;
-            alertBox.innerText = '✅ Account created! Click Sign In to access.';
+            alertBox.innerText = '✅ Account created! Sign in to access your User Panel.';
             alertBox.style.background = 'rgba(16, 185, 129, 0.15)';
             alertBox.style.borderColor = 'rgba(16, 185, 129, 0.4)';
             alertBox.style.color = '#a7f3d0';
@@ -262,17 +336,29 @@
         }
     }
 
-    function handleVerify(event) {
+    function handleAccountRecovery(event) {
         event.preventDefault();
-        const code = document.getElementById('verifyCode').value;
+        const user = document.getElementById('recoverUser').value;
+        const code = document.getElementById('recoverCode').value;
         const alertBox = document.getElementById('authAlert');
 
-        const result = DB.auth.verifyAccount(code);
+        const result = DB.auth.recoverAccount(user, code);
         if (result.success) {
-            showToast("Account verified successfully! Please Sign In.");
-            switchTab('login');
+            alertBox.style.background = 'rgba(16, 185, 129, 0.15)';
+            alertBox.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+            alertBox.style.color = '#a7f3d0';
+            alertBox.innerText = result.message;
+            alertBox.style.display = 'block';
+            showToast("Account recovered successfully!");
+
+            setTimeout(() => {
+                redirectUserByRole(result.session);
+            }, 1200);
         } else {
             alertBox.innerText = '⚠️ ' + result.message;
+            alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
+            alertBox.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+            alertBox.style.color = '#fca5a5';
             alertBox.style.display = 'block';
         }
     }

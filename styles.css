@@ -755,3 +755,62 @@ a:hover {
     cursor: pointer;
 }
 
+/* ==========================================================================
+   2FA & Google Authenticator UI Extensions
+   ========================================================================== */
+
+.totp-box {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--border-accent);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.recovery-code-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.recovery-code-chip {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    padding: 0.4rem 0.6rem;
+    font-family: monospace;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    color: #67e8f9;
+    text-align: center;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.role-badge.superadmin {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.role-badge.admin {
+    background: rgba(99, 102, 241, 0.2);
+    color: #a5b4fc;
+    border: 1px solid rgba(99, 102, 241, 0.4);
+}
+
+.role-badge.user {
+    background: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+
