@@ -14,8 +14,8 @@
             <div class="brand-icon">⚡</div>
             <span>DualLink Hub</span>
         </div>
-        <div class="nav-links">
-            <!-- Buttons removed from here -->
+        <div class="nav-links" id="navUserArea">
+            <!-- Dynamically populated user profile icon or login button -->
         </div>
     </nav>
 
@@ -171,9 +171,75 @@
             showToast(`Downloaded ${filename}!`);
         }
 
-        // Initialize grid on page load
+        function renderUserNav() {
+            const container = document.getElementById('navUserArea');
+            if (!container) return;
+
+            const session = (window.DB && window.DB.auth) ? DB.auth.getSession() : null;
+
+            if (session) {
+                const isAdmin = session.role === 'superadmin' || session.role === 'admin';
+                const dashboardUrl = isAdmin ? 'admin' : 'user';
+                const dashboardLabel = isAdmin ? '⚙️ Admin Panel' : '👤 Dashboard';
+                const initial = (session.name || session.username || 'U').charAt(0).toUpperCase();
+
+                container.innerHTML = `
+                    <div class="user-profile-menu">
+                        <button class="user-profile-btn" onclick="toggleUserDropdown(event)" id="userProfileBtn" title="User Profile">
+                            <div class="user-avatar-icon">${initial}</div>
+                            <span>${escapeHTML(session.name || session.username)}</span>
+                            <span style="font-size: 0.75rem; opacity: 0.7;">▼</span>
+                        </button>
+
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="user-dropdown-header">
+                                <div class="user-dropdown-name">${escapeHTML(session.name || session.username)}</div>
+                                <div class="user-dropdown-role">${escapeHTML(session.role || 'user')}</div>
+                            </div>
+                            <a href="${dashboardUrl}" class="user-dropdown-item">
+                                ${dashboardLabel}
+                            </a>
+                            <button onclick="DB.auth.logout()" class="user-dropdown-item danger">
+                                🔒 Logout
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <a href="login" class="nav-btn nav-btn-primary" style="text-decoration: none;">
+                        <div class="user-avatar-icon" style="width: 24px; height: 24px; font-size: 0.75rem; background: transparent; box-shadow: none;">👤</div>
+                        <span>Login / Account</span>
+                    </a>
+                `;
+            }
+        }
+
+        function toggleUserDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('userDropdown');
+            const btn = document.getElementById('userProfileBtn');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+            if (btn) {
+                btn.classList.toggle('active');
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('userDropdown');
+            const btn = document.getElementById('userProfileBtn');
+            if (dropdown && !dropdown.contains(e.target) && btn && !btn.contains(e.target)) {
+                dropdown.classList.remove('show');
+                btn.classList.remove('active');
+            }
+        });
+
+        // Initialize grid & user navigation on page load
         document.addEventListener('DOMContentLoaded', () => {
             renderCards();
+            renderUserNav();
         });
     </script>
 </body>
