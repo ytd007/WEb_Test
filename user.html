@@ -321,20 +321,22 @@
             document.getElementById('portalCount').innerText = userLinks.length;
 
             if (userLinks.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No portals created yet. Use the form on the left to create your first portal!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">No portals created yet. Use the form on the left to create your first portal!</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = userLinks.map(link => `
                 <tr>
-                    <td><strong>${escapeHTML(link.title)}</strong></td>
-                    <td><span class="role-badge" style="background: rgba(99,102,241,0.2); color: #a5b4fc;">${link.theme}</span></td>
-                    <td style="text-align: center;"><span class="badge badge-indigo">👁️ ${link.clicks || 0}</span></td>
+                    <td><strong style="color: var(--text-primary); font-size: 0.95rem;">${escapeHTML(link.title)}</strong></td>
+                    <td><span class="badge badge-${link.theme || 'crimson'}">${escapeHTML(link.theme || 'crimson')}</span></td>
+                    <td style="text-align: center;"><span class="click-badge">👁️ ${link.clicks || 0}</span></td>
                     <td style="font-size: 0.85rem; color: var(--text-muted);">${link.createdAt || 'Today'}</td>
                     <td style="text-align: right;">
-                        <button onclick="copyLinkShare('${link.id}')" class="btn btn-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.8rem;" title="Copy Share Link">🔗 Share</button>
-                        <button onclick="editUserLink('${link.id}')" class="btn btn-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.8rem;">✏️ Edit</button>
-                        <button onclick="deleteUserLink('${link.id}')" class="btn btn-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.8rem; color: #fca5a5;">🗑️</button>
+                        <div class="action-btn-group">
+                            <button onclick="copyLinkShare('${link.id}')" class="tbl-btn tbl-btn-share" title="Copy Universal Share Link">🔗 Share</button>
+                            <button onclick="editUserLink('${link.id}')" class="tbl-btn tbl-btn-edit" title="Edit Portal">✏️ Edit</button>
+                            <button onclick="deleteUserLink('${link.id}')" class="tbl-btn tbl-btn-delete" title="Delete Portal">🗑️</button>
+                        </div>
                     </td>
                 </tr>
             `).join('');

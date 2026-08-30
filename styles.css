@@ -704,6 +704,7 @@ a:hover {
     margin-top: 1.25rem;
     border-radius: var(--radius-md);
     border: 1px solid var(--border-light);
+    background: rgba(9, 13, 22, 0.5);
 }
 
 table,
@@ -717,26 +718,105 @@ table,
 
 th,
 .custom-table th {
-    background: rgba(9, 13, 22, 0.9);
-    padding: 1rem 1.15rem;
+    background: rgba(14, 20, 35, 0.95);
+    padding: 0.9rem 1.1rem;
     color: var(--text-secondary);
-    font-weight: 600;
+    font-weight: 700;
     border-bottom: 1px solid var(--border-light);
     text-transform: uppercase;
     font-size: 0.78rem;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
 }
 
 td,
 .custom-table td {
-    padding: 1rem 1.15rem;
+    padding: 0.85rem 1.1rem;
     border-bottom: 1px solid var(--border-light);
     vertical-align: middle;
 }
 
 tr:hover td,
 .custom-table tr:hover td {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+/* Click Badge */
+.click-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.75rem;
+    background: rgba(99, 102, 241, 0.15);
+    border: 1px solid rgba(99, 102, 241, 0.35);
+    border-radius: 20px;
+    color: #a5b4fc;
+    font-weight: 700;
+    font-size: 0.82rem;
+    white-space: nowrap;
+}
+
+/* Table Action Buttons */
+.action-btn-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.4rem;
+    flex-wrap: nowrap;
+}
+
+.tbl-btn {
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.82rem;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    white-space: nowrap;
+    min-height: 32px;
+}
+
+.tbl-btn-share {
+    background: rgba(99, 102, 241, 0.14);
+    border-color: rgba(99, 102, 241, 0.35);
+    color: #a5b4fc;
+}
+
+.tbl-btn-share:hover {
+    background: rgba(99, 102, 241, 0.28);
+    border-color: var(--accent-indigo);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.tbl-btn-edit {
+    background: rgba(6, 182, 212, 0.14);
+    border-color: rgba(6, 182, 212, 0.35);
+    color: #67e8f9;
+}
+
+.tbl-btn-edit:hover {
+    background: rgba(6, 182, 212, 0.28);
+    border-color: var(--accent-cyan);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.tbl-btn-delete {
+    background: rgba(239, 68, 68, 0.14);
+    border-color: rgba(239, 68, 68, 0.35);
+    color: #fca5a5;
+}
+
+.tbl-btn-delete:hover {
+    background: rgba(239, 68, 68, 0.28);
+    border-color: var(--accent-crimson);
+    color: #ffffff;
+    transform: translateY(-1px);
 }
 
 /* Empty State */
