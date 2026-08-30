@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DualLink Hub - Home Page</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <nav class="navbar">
+        <div class="brand">
+            <div class="brand-icon">⚡</div>
+            <span>DualLink Hub</span>
+        </div>
+        <div class="nav-links">
+            <!-- Buttons removed from here -->
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="main-container">
+        
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-tag">
+                <span>🔥 Direct Link & Popup Portal</span>
+            </div>
+            <h1 class="hero-title">Dual-Link Redirection Center</h1>
+            <p class="hero-subtitle">
+                Manage, launch, and generate custom single-button dual web pages (`new.html` format) that open main destination links along with ad/CPM networks.
+            </p>
+
+            <div class="notice-box" style="max-width: 720px; margin: 0 auto 2rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div style="text-align: left;">
+                    <strong>Popup Blocker Alert:</strong> බ්‍රව්සරයේ Popup Blocker සක්‍රීය වී තිබුණහොත් Links දෙකම එකවර විවෘත නොවනු ඇත. කරුණාකර Popups සක්‍රීය (Allow) කරන්න.
+                </div>
+            </div>
+        </section>
+
+        <!-- Link Grid Section -->
+        <section>
+            <div class="grid-header">
+                <div>
+                    <h2>Available Web Portals</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Click any card to launch both target & sponsor links.</p>
+                </div>
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="Search portals...">
+                </div>
+            </div>
+
+            <div id="cardGrid" class="card-grid">
+                <!-- Cards dynamically populated by JavaScript -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Preview Modal -->
+    <div id="codeModal" class="modal-backdrop">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <h3 style="margin-bottom: 0.5rem;" id="modalTitle">Generated HTML Code</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+                This code produces a standalone HTML web page like <code>new.html</code>.
+            </p>
+            <textarea id="modalCodeArea" readonly style="width: 100%; height: 260px; background: rgba(11,15,25,0.9); color: #a5b4fc; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1rem; font-family: monospace; font-size: 0.85rem; outline: none; margin-bottom: 1rem; resize: none;"></textarea>
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button class="btn btn-outline" onclick="copyModalCode()">📋 Copy Code</button>
+                <button class="btn btn-indigo" id="downloadModalBtn">📥 Download .html</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="db.js"></script>
+    <script src="app.js"></script>
+    <script>
+        let currentModalItem = null;
+
+        function renderCards(filterText = '') {
+            const grid = document.getElementById('cardGrid');
+            const links = getStoredLinks();
+            
+            const filtered = links.filter(item => 
+                item.title.toLowerCase().includes(filterText.toLowerCase()) ||
+                item.mainLink.toLowerCase().includes(filterText.toLowerCase()) ||
+                item.btnText.toLowerCase().includes(filterText.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-icon">📭</div>
+                        <h3>No Portals Found</h3>
+                        <p>No links created yet. Click below to add your first portal from the Admin Panel.</p>
+                        <a href="admin" class="btn btn-indigo" style="margin-top: 1rem;">⚙️ Go to Admin Panel</a>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(item => {
+                const viewUrl = getShareableURL(item);
+                return `
+                <div class="link-card" onclick="window.open('${viewUrl}', '_blank')" style="cursor: pointer;">
+                    <div class="card-header" style="margin-bottom: 1.5rem;">
+                        <div>
+                            <div class="card-title">${escapeHTML(item.title)}</div>
+                            <span class="badge badge-${item.theme || 'crimson'}">${escapeHTML(item.theme || 'crimson')}</span>
+                        </div>
+                    </div>
+
+                    <div class="card-actions">
+                        <a href="${viewUrl}" target="_blank" class="btn btn-${item.theme || 'crimson'} btn-block" style="padding: 0.9rem 1.5rem; font-size: 1rem; text-decoration: none;" onclick="event.stopPropagation();">
+                            ▶ Open Web Page (${escapeHTML(item.btnText)})
+                        </a>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            renderCards(e.target.value);
+        });
+
+        function openCodeModal(id) {
+            const links = getStoredLinks();
+            const item = links.find(l => l.id === id);
+            if (!item) return;
+
+            currentModalItem = item;
+            const code = generateStandaloneHTMLCode(item.title, item.btnText, item.adLink, item.mainLink, item.theme);
+            
+            document.getElementById('modalTitle').innerText = item.title + " - HTML Code";
+            document.getElementById('modalCodeArea').value = code;
+            document.getElementById('codeModal').classList.add('active');
+
+            document.getElementById('downloadModalBtn').onclick = function() {
+                downloadHTMLFile(item.title, code);
+            };
+        }
+
+        function closeModal() {
+            document.getElementById('codeModal').classList.remove('active');
+        }
+
+        function copyModalCode() {
+            const code = document.getElementById('modalCodeArea').value;
+            navigator.clipboard.writeText(code);
+            showToast("HTML Code copied to clipboard!");
+        }
+
+        function downloadHTMLFile(title, codeContent) {
+            const filename = title.toLowerCase().replace(/[^a-z0-9]/g, '-') + '.html';
+            const blob = new Blob([codeContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(`Downloaded ${filename}!`);
+        }
+
+        // Initialize grid on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCards();
+        });
+    </script>
+</body>
+</html>

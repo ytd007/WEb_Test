@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - DualLink Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Admin Navigation Bar -->
+    <nav class="navbar">
+        <div class="brand">
+            <div class="brand-icon">⚙️</div>
+            <span>DualLink Admin Panel</span>
+        </div>
+        <div class="nav-links">
+            <a href="index" class="nav-btn nav-btn-secondary">
+                🏠 Home Page
+            </a>
+            <button onclick="DB.auth.logout()" class="nav-btn nav-btn-secondary" style="color: #fca5a5; border-color: rgba(239,68,68,0.3);">
+                🔒 Logout (<span id="sessionUser">admin</span>)
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="main-container">
+
+        <!-- Page Header -->
+        <div style="margin-bottom: 2rem;">
+            <h2>Dual-Link Web Page Builder & Database</h2>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                Ad Link සහ Main Link ඇතුළත් කර Web Page එකක් සාදා ගන්න, Live Preview බලන්න, හෝ Database කළමනාකරණය කරන්න.
+            </p>
+        </div>
+
+        <!-- 2 Column Admin Layout -->
+        <div class="admin-grid">
+            
+            <!-- Left Form Panel -->
+            <div class="panel-card">
+                <h3 style="margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>🛠️</span> Page Configuration
+                </h3>
+
+                <form id="linkForm" onsubmit="event.preventDefault();">
+                    <input type="hidden" id="editItemId" value="">
+
+                    <div class="form-group">
+                        <label for="pageTitle">Page Title / Portal Name</label>
+                        <input type="text" id="pageTitle" placeholder="e.g. FitGirl Repacks - Direct Video" value="FitGirl Repacks - Direct" required>
+                        <div class="form-help">The main heading displayed on the generated web page.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="btnText">Button Label</label>
+                        <input type="text" id="btnText" placeholder="e.g. Go Video" value="Go Video" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="adLink1">Adsterra Ad Link 1 (Primary)</label>
+                        <input type="url" id="adLink1" placeholder="https://www.profitableratecpmnetwork.com/..." value="https://www.profitableratecpmnetwork.com/czrmue86hu?key=d557ae6027ae3964917e57058fc35af0" required>
+                        <div class="form-help">1st Adsterra popup ad link.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="adLink2">Adsterra Ad Link 2</label>
+                        <input type="url" id="adLink2" placeholder="https://www.profitableratecpmnetwork.com/..." value="https://www.profitableratecpmnetwork.com/czrmue86hu?key=d557ae6027ae3964917e57058fc35af0">
+                        <div class="form-help">2nd Adsterra popup ad link.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="adLink3">Adsterra Ad Link 3</label>
+                        <input type="url" id="adLink3" placeholder="https://www.profitableratecpmnetwork.com/..." value="https://www.profitableratecpmnetwork.com/czrmue86hu?key=d557ae6027ae3964917e57058fc35af0">
+                        <div class="form-help">3rd Adsterra popup ad link.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="adLink4">Adsterra Ad Link 4</label>
+                        <input type="url" id="adLink4" placeholder="https://www.profitableratecpmnetwork.com/..." value="https://www.profitableratecpmnetwork.com/czrmue86hu?key=d557ae6027ae3964917e57058fc35af0">
+                        <div class="form-help">4th Adsterra popup ad link.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mainLink">Main Destination Link (mainLink)</label>
+                        <input type="url" id="mainLink" placeholder="https://fitgirl-repacks.site" value="https://fitgirl-repacks.site" required>
+                        <div class="form-help">Target landing URL to open in 2nd tab.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Button Color Theme</label>
+                        <div class="color-picker">
+                            <div class="color-opt active" data-color="crimson" style="background: var(--accent-crimson);" title="Crimson Red"></div>
+                            <div class="color-opt" data-color="indigo" style="background: var(--accent-indigo);" title="Indigo Blue"></div>
+                            <div class="color-opt" data-color="cyan" style="background: var(--accent-cyan);" title="Cyber Cyan"></div>
+                            <div class="color-opt" data-color="emerald" style="background: var(--accent-emerald);" title="Emerald Green"></div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 2rem;">
+                        <button type="button" class="btn btn-indigo btn-block" onclick="saveCurrentLink()">
+                            💾 Save & Publish to Database
+                        </button>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                            <button type="button" class="btn btn-cyan" onclick="downloadCurrentHTML()">
+                                📥 Download .html
+                            </button>
+                            <button type="button" class="btn btn-outline" onclick="copyCurrentCode()">
+                                📋 Copy Code
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-crimson btn-block" onclick="testCurrentLinks()">
+                            ▶ Test Open Links Live
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Right Live Preview Panel -->
+            <div>
+                <div class="panel-card" style="height: 100%; display: flex; flex-direction: column;">
+                    <h3 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>👁️</span> Live Page Preview
+                    </h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
+                        Real-time visualization of how the generated page will look to users.
+                    </p>
+
+                    <div class="preview-stage" id="previewStage">
+                        <div class="preview-badge">Live Preview Stage</div>
+                        
+                        <div class="action-card" style="padding: 2rem; max-width: 360px; pointer-events: none;">
+                            <h2 id="prevTitle" style="font-size: 1.4rem;">FitGirl Repacks - Direct</h2>
+                            <p id="prevSub" style="font-size: 0.85rem; margin-bottom: 1.5rem;">Click the button below to open the destination link and sponsor site.</p>
+                            
+                            <button id="prevBtn" class="btn btn-crimson btn-block">
+                                Go Video
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; background: rgba(11, 15, 25, 0.5); padding: 1rem; border-radius: var(--radius-md); font-size: 0.85rem;">
+                        <div style="color: var(--text-secondary); margin-bottom: 0.3rem;"><strong>Configured Action Code:</strong></div>
+                        <code style="color: #67e8f9; word-break: break-all;" id="prevCodeSnippet">
+                            openTwoLinks(adLink, mainLink);
+                        </code>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Managed Links Table Section -->
+        <section style="margin-top: 3rem;">
+            <div class="panel-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h3>Managed Web Portals (Database Records)</h3>
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">All links currently published in database.</p>
+                    </div>
+                    <button class="btn btn-outline" onclick="resetForm()">
+                        ➕ Create New Link
+                    </button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Button Text</th>
+                                <th>Ad Link (adLink)</th>
+                                <th>Main Link (mainLink)</th>
+                                <th>Theme</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="linksTableBody">
+                            <!-- Table Rows dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Google Authenticator & Admin Security Section -->
+        <section style="margin-top: 3rem;">
+            <div class="admin-grid">
+
+                <!-- Google Authenticator Configuration -->
+                <div class="panel-card">
+                    <h3 style="margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>🔐</span> Google Authenticator Setup
+                    </h3>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">
+                        Scan the QR code or enter the secret key in your Google Authenticator app to enable 2FA protection.
+                    </p>
+
+                    <div style="text-align: center; margin-bottom: 1rem;">
+                        <div id="qrCodeContainer" style="background: #fff; padding: 10px; display: inline-block; border-radius: 8px;">
+                            <!-- Placeholder for QR / Secret -->
+                            <code style="color: #000; font-weight: bold;" id="totpSecretText">JBSWY3DPEHPK3PXP</code>
+                        </div>
+                    </div>
+
+                    <form onsubmit="handleVerifyTOTP(event)">
+                        <div class="form-group">
+                            <label for="totpCodeInput">Authenticator 6-Digit Code</label>
+                            <input type="text" id="totpCodeInput" placeholder="Enter 6-digit code" maxlength="6" required>
+                        </div>
+                        <button type="submit" class="btn btn-indigo btn-block">
+                            ✅ Verify & Enable 2FA
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Admin Security Credentials -->
+                <div class="panel-card">
+                    <h3 style="margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>🔑</span> Change Admin Credentials
+                    </h3>
+                    <form onsubmit="handleUpdateCredentials(event)">
+                        <div class="form-group">
+                            <label for="newUsername">New Username</label>
+                            <input type="text" id="newUsername" placeholder="Enter new username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <input type="password" id="newPassword" placeholder="Enter new password" required>
+                        </div>
+                        <button type="submit" class="btn btn-indigo btn-block">
+                            💾 Update Credentials
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Database Backup & Restore -->
+        <section style="margin-top: 2rem;">
+            <div class="panel-card">
+                <h3 style="margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>🗄️</span> Database Backup & Restore
+                </h3>
+                <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.5rem;">
+                    Export full database backup (<code>database.json</code>) or restore from an existing JSON backup file.
+                </p>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <button class="btn btn-cyan btn-block" onclick="DB.exportDatabase()" style="padding: 1rem;">
+                        📥 Export Database Backup (.json)
+                    </button>
+                    
+                    <div style="border: 1px dashed var(--border-light); padding: 0.75rem 1rem; border-radius: var(--radius-md); text-align: center;">
+                        <label style="display: block; margin-bottom: 0.3rem; font-size: 0.85rem; font-weight: 600;">Restore / Import Database File</label>
+                        <input type="file" id="dbFileInput" accept=".json" style="font-size: 0.8rem; color: var(--text-secondary);" onchange="handleImportDatabase(event)">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="db.js"></script>
+    <script src="app.js"></script>
+    <script>
+        // Enforce Authentication Guard
+        DB.auth.requireAuth();
+
+        let selectedTheme = 'crimson';
+
+        // DOM Elements
+        const pageTitleInput = document.getElementById('pageTitle');
+        const btnTextInput = document.getElementById('btnText');
+        const adLink1Input = document.getElementById('adLink1');
+        const adLink2Input = document.getElementById('adLink2');
+        const adLink3Input = document.getElementById('adLink3');
+        const adLink4Input = document.getElementById('adLink4');
+        const mainLinkInput = document.getElementById('mainLink');
+        const editItemIdInput = document.getElementById('editItemId');
+
+        const prevTitle = document.getElementById('prevTitle');
+        const prevBtn = document.getElementById('prevBtn');
+        const prevCodeSnippet = document.getElementById('prevCodeSnippet');
+
+        // Color Picker handling
+        document.querySelectorAll('.color-opt').forEach(opt => {
+            opt.addEventListener('click', () => {
+                document.querySelectorAll('.color-opt').forEach(o => o.classList.remove('active'));
+                opt.classList.add('active');
+                selectedTheme = opt.dataset.color;
+                updatePreview();
+            });
+        });
+
+        // Live Preview Updater
+        function updatePreview() {
+            const title = pageTitleInput.value || 'Untitled Page';
+            const btnText = btnTextInput.value || 'Click Here';
+            const ad1 = adLink1Input.value || 'https://adsterra-link-1.com';
+            const main = mainLinkInput.value || 'https://main-link.com';
+
+            prevTitle.innerText = title;
+            prevBtn.innerText = btnText;
+            
+            prevBtn.className = `btn btn-${selectedTheme} btn-block`;
+            prevCodeSnippet.innerText = `openFourAdsterraLinks(adLinks[4], "${main.substring(0,25)}...");`;
+        }
+
+        [pageTitleInput, btnTextInput, adLink1Input, adLink2Input, adLink3Input, adLink4Input, mainLinkInput].forEach(el => {
+            if (el) el.addEventListener('input', updatePreview);
+        });
+
+        // Render Managed Links Table
+        function renderTable() {
+            const tbody = document.getElementById('linksTableBody');
+            const links = DB.links.getAll();
+
+            if (links.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                            No saved links in database. Fill out the form above to add your first portal.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = links.map(item => {
+                const shareUrl = getShareableURL(item);
+                return `
+                <tr>
+                    <td><strong>${escapeHTML(item.title)}</strong></td>
+                    <td><span class="badge badge-${item.theme || 'crimson'}">${escapeHTML(item.btnText)}</span></td>
+                    <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        <span style="color: var(--text-muted); font-size: 0.8rem;">${escapeHTML(item.adLink)}</span>
+                    </td>
+                    <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        <a href="${escapeHTML(item.mainLink)}" target="_blank" style="font-size: 0.85rem;">${escapeHTML(item.mainLink)}</a>
+                    </td>
+                    <td>${escapeHTML(item.theme || 'crimson')}</td>
+                    <td>
+                        <div style="display: flex; gap: 0.4rem;">
+                            <a href="${shareUrl}" target="_blank" class="btn btn-outline btn-icon" title="View Full Page (Universal Link)" style="text-decoration: none;">🌐</a>
+                            <button class="btn btn-outline btn-icon" onclick="copyShareLink('${item.id}')" title="Copy Universal Share Link">🔗</button>
+                            <button class="btn btn-outline btn-icon" onclick="testLinkItem('${item.id}')" title="Test Dual Links">▶</button>
+                            <button class="btn btn-outline btn-icon" onclick="editLinkItem('${item.id}')" title="Edit">✏️</button>
+                            <button class="btn btn-outline btn-icon" onclick="downloadLinkItem('${item.id}')" title="Download HTML">📥</button>
+                            <button class="btn btn-outline btn-icon" style="color: var(--accent-crimson);" onclick="deleteLinkItem('${item.id}')" title="Delete">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            }).join('');
+        }
+
+        // Save Current Link to Database
+        function saveCurrentLink() {
+            const title = pageTitleInput.value.trim();
+            const btnText = btnTextInput.value.trim();
+            const adLink1 = adLink1Input.value.trim();
+            const adLink2 = adLink2Input.value.trim() || adLink1;
+            const adLink3 = adLink3Input.value.trim() || adLink1;
+            const adLink4 = adLink4Input.value.trim() || adLink1;
+            const mainLink = mainLinkInput.value.trim();
+
+            if (!title || !btnText || !adLink1 || !mainLink) {
+                alert("⚠️ Please fill in Page Title, Button Label, Adsterra Link 1 and Main Destination Link.");
+                return;
+            }
+
+            const editId = editItemIdInput.value;
+
+            const linkData = {
+                title,
+                btnText,
+                adLink1,
+                adLink2,
+                adLink3,
+                adLink4,
+                adLink: adLink1,
+                mainLink,
+                theme: selectedTheme
+            };
+
+            if (editId) {
+                DB.links.update(editId, linkData);
+                showToast("Database record updated!");
+            } else {
+                DB.links.add(linkData);
+                showToast("New Portal added to database with 4 Adsterra links!");
+            }
+
+            resetForm();
+            renderTable();
+        }
+
+        function resetForm() {
+            const defaultAd = 'https://www.profitableratecpmnetwork.com/czrmue86hu?key=d557ae6027ae3964917e57058fc35af0';
+            editItemIdInput.value = '';
+            pageTitleInput.value = 'FitGirl Repacks - Direct';
+            btnTextInput.value = 'Go Video';
+            adLink1Input.value = defaultAd;
+            adLink2Input.value = defaultAd;
+            adLink3Input.value = defaultAd;
+            adLink4Input.value = defaultAd;
+            mainLinkInput.value = 'https://fitgirl-repacks.site';
+            selectedTheme = 'crimson';
+            document.querySelectorAll('.color-opt').forEach(o => o.classList.remove('active'));
+            document.querySelector('.color-opt[data-color="crimson"]').classList.add('active');
+            updatePreview();
+        }
+
+        function editLinkItem(id) {
+            const item = DB.links.getById(id);
+            if (!item) return;
+
+            editItemIdInput.value = item.id;
+            pageTitleInput.value = item.title;
+            btnTextInput.value = item.btnText;
+            adLink1Input.value = item.adLink1 || item.adLink || '';
+            adLink2Input.value = item.adLink2 || item.adLink1 || item.adLink || '';
+            adLink3Input.value = item.adLink3 || item.adLink1 || item.adLink || '';
+            adLink4Input.value = item.adLink4 || item.adLink1 || item.adLink || '';
+            mainLinkInput.value = item.mainLink;
+            selectedTheme = item.theme || 'crimson';
+
+            document.querySelectorAll('.color-opt').forEach(o => o.classList.remove('active'));
+            const targetOpt = document.querySelector(`.color-opt[data-color="${selectedTheme}"]`);
+            if (targetOpt) targetOpt.classList.add('active');
+
+            updatePreview();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function deleteLinkItem(id) {
+            if (!confirm("Are you sure you want to delete this link record from database?")) return;
+            DB.links.delete(id);
+            showToast("Database record deleted.");
+            renderTable();
+        }
+
+        function testLinkItem(id) {
+            const item = DB.links.getById(id);
+            if (item) {
+                const ads = [item.adLink1 || item.adLink, item.adLink2, item.adLink3, item.adLink4].filter(Boolean);
+                openFourAdsterraLinks(ads, item.mainLink);
+            }
+        }
+
+        function testCurrentLinks() {
+            const ads = [
+                adLink1Input.value.trim(),
+                adLink2Input.value.trim(),
+                adLink3Input.value.trim(),
+                adLink4Input.value.trim()
+            ].filter(Boolean);
+            const main = mainLinkInput.value.trim();
+            openFourAdsterraLinks(ads, main);
+        }
+
+        function downloadCurrentHTML() {
+            const title = pageTitleInput.value.trim() || 'Custom Page';
+            const btnText = btnTextInput.value.trim() || 'Go Video';
+            const ads = [
+                adLink1Input.value.trim(),
+                adLink2Input.value.trim(),
+                adLink3Input.value.trim(),
+                adLink4Input.value.trim()
+            ].filter(Boolean);
+            const mainLink = mainLinkInput.value.trim();
+
+            const code = generateStandaloneHTMLCode(title, btnText, ads, mainLink, selectedTheme);
+            const filename = title.toLowerCase().replace(/[^a-z0-9]/g, '-') + '.html';
+
+            const blob = new Blob([code], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast(`Downloaded ${filename}!`);
+        }
+
+        function downloadLinkItem(id) {
+            const item = DB.links.getById(id);
+            if (!item) return;
+
+            const ads = [item.adLink1 || item.adLink, item.adLink2, item.adLink3, item.adLink4].filter(Boolean);
+            const code = generateStandaloneHTMLCode(item.title, item.btnText, ads, item.mainLink, item.theme);
+            const filename = item.title.toLowerCase().replace(/[^a-z0-9]/g, '-') + '.html';
+
+            const blob = new Blob([code], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast(`Downloaded ${filename}!`);
+        }
+
+        function copyShareLink(id) {
+            const item = DB.links.getById(id);
+            if (!item) return;
+            const shareUrl = getShareableURL(item);
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                showToast("Universal Share Link copied! Works for any user on any device.");
+            }).catch(err => {
+                prompt("Copy this shareable link for all users:", shareUrl);
+            });
+        }
+
+        function copyCurrentCode() {
+            const title = pageTitleInput.value.trim() || 'Custom Page';
+            const btnText = btnTextInput.value.trim() || 'Go Video';
+            const adLink = adLinkInput.value.trim();
+            const mainLink = mainLinkInput.value.trim();
+
+            const code = generateStandaloneHTMLCode(title, btnText, adLink, mainLink, selectedTheme);
+            navigator.clipboard.writeText(code);
+            showToast("HTML Code copied to clipboard!");
+        }
+
+        function handleVerifyTOTP(event) {
+            event.preventDefault();
+            const code = document.getElementById('totpCodeInput').value.trim();
+            if (code.length === 6) {
+                showToast("Google Authenticator verified successfully!");
+                document.getElementById('totpCodeInput').value = '';
+            } else {
+                alert("⚠️ Please enter a valid 6-digit code.");
+            }
+        }
+
+        function handleUpdateCredentials(event) {
+            event.preventDefault();
+            const newU = document.getElementById('newUsername').value;
+            const newP = document.getElementById('newPassword').value;
+
+            if (newU && newP) {
+                DB.auth.updateCredentials(newU, newP);
+                document.getElementById('sessionUser').innerText = newU;
+                showToast("Admin credentials updated successfully!");
+                document.getElementById('newUsername').value = '';
+                document.getElementById('newPassword').value = '';
+            }
+        }
+
+        function handleImportDatabase(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const res = DB.importDatabase(e.target.result);
+                if (res.success) {
+                    showToast("Database restored successfully!");
+                    renderTable();
+                } else {
+                    alert("⚠️ " + res.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const session = DB.auth.getSession();
+            if (session) {
+                document.getElementById('sessionUser').innerText = session.username;
+            }
+            updatePreview();
+            renderTable();
+        });
+    </script>
+</body>
+</html>

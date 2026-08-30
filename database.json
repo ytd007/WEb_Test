@@ -1,0 +1,26 @@
+{
+  "settings": {
+    "siteName": "DualLink Hub",
+    "version": "2.0.0"
+  },
+  "users": [
+    {
+      "id": "usr-admin-1",
+      "username": "admin",
+      "password": "123",
+      "role": "superadmin",
+      "createdAt": "2026-08-26T00:00:00.000Z"
+    }
+  ],
+  "links": [
+    {
+      "id": "link-default-1",
+      "title": "FitGirl Repacks - Direct",
+      "btnText": "Go Video",
+      "adLink": "https://www.profitableratecpmnetwork.com/czrmue86hu?key=d557ae6027ae3964917e57058fc35af0",
+      "mainLink": "https://fitgirl-repacks.site",
+      "theme": "crimson",
+      "createdAt": "8/26/2026"
+    }
+  ]
+}

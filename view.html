@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="headTitle">Direct Link Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="standalone-wrapper">
+    <div class="action-card">
+        <div class="hero-tag" style="margin-bottom: 1.25rem;">
+            <span>🚀 Direct Link Ready</span>
+        </div>
+        <h2 id="portalTitle">Portal Destination</h2>
+        <p id="portalDesc">Click the button below to open the destination link and sponsor site.</p>
+        
+        <button id="actionBtn" class="btn btn-crimson btn-block" style="padding: 1.1rem 2rem; font-size: 1.15rem; margin-bottom: 1.25rem;">
+            ▶ Launch
+        </button>
+
+        <div style="font-size: 0.8rem; color: var(--text-muted);">
+            ⚠️ Note: Make sure popup blockers are disabled for popups to open correctly.
+        </div>
+    </div>
+</div>
+
+<script src="db.js"></script>
+<script src="app.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const dataParam = urlParams.get('data');
+        const idParam = urlParams.get('id');
+        const adParam = urlParams.get('ad');
+        const mainParam = urlParams.get('main');
+        
+        let item = null;
+
+        // 1. Universal Base64 encoded URL payload (Works for all users on any device)
+        if (dataParam) {
+            item = decodeItemFromURL(dataParam);
+        }
+
+        // 2. Direct query parameters (view?title=...&ad=...&main=...)
+        if (!item && adParam && mainParam) {
+            item = {
+                title: urlParams.get('title') || 'Direct Link Portal',
+                btnText: urlParams.get('btn') || 'Go Video',
+                adLink: adParam,
+                mainLink: mainParam,
+                theme: urlParams.get('theme') || 'crimson'
+            };
+        }
+
+        // 3. LocalStorage lookup by ID
+        if (!item && idParam) {
+            const links = getStoredLinks();
+            if (links && links.length > 0) {
+                item = links.find(l => l.id === idParam);
+            }
+        }
+
+        // 4. Default fallback item
+        if (!item) {
+            const links = getStoredLinks();
+            if (links && links.length > 0) {
+                item = links[0];
+            } else {
+                item = {
+                    title: "FitGirl Repacks - Direct",
+                    btnText: "Go Video",
+                    adLink: "https://www.profitableratecpmnetwork.com/czrmue86hu?key=d557ae6027ae3964917e57058fc35af0",
+                    mainLink: "https://fitgirl-repacks.site",
+                    theme: "crimson"
+                };
+            }
+        }
+
+        if (item) {
+            document.getElementById('headTitle').innerText = item.title;
+            document.getElementById('portalTitle').innerText = item.title;
+            document.getElementById('actionBtn').innerText = '▶ ' + item.btnText;
+            document.getElementById('actionBtn').className = `btn btn-${item.theme || 'crimson'} btn-block`;
+            
+            document.getElementById('actionBtn').addEventListener('click', function() {
+                const adLinks = [
+                    item.adLink1 || item.adLink,
+                    item.adLink2,
+                    item.adLink3,
+                    item.adLink4
+                ].filter(Boolean);
+                openFourAdsterraLinks(adLinks, item.mainLink);
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
