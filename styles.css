@@ -100,6 +100,12 @@ a:hover {
     background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.brand:hover {
+    opacity: 0.9;
 }
 
 .brand-icon {
@@ -113,6 +119,7 @@ a:hover {
     color: white;
     font-size: 1.2rem;
     box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    -webkit-text-fill-color: initial;
 }
 
 .nav-links {

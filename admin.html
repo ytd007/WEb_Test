@@ -10,14 +10,11 @@
 
     <!-- Admin Navigation Bar -->
     <nav class="navbar">
-        <div class="brand">
+        <a href="./" class="brand" title="Go to Home Page">
             <div class="brand-icon">⚙️</div>
             <span>DualLink Admin Panel</span>
-        </div>
+        </a>
         <div class="nav-links">
-            <a href="index" class="nav-btn nav-btn-secondary">
-                🏠 Home Page
-            </a>
             <button onclick="DB.auth.logout()" class="nav-btn nav-btn-secondary" style="color: #fca5a5; border-color: rgba(239,68,68,0.3);">
                 🔒 Logout (<span id="sessionUser">admin</span>)
             </button>
