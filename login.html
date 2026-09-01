@@ -136,11 +136,9 @@
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
         const totpForm = document.getElementById('totpForm');
-        const recoverForm = document.getElementById('recoverForm');
         
         const tabLogin = document.getElementById('tabLogin');
         const tabRegister = document.getElementById('tabRegister');
-        const tabRecover = document.getElementById('tabRecover');
         const tabTotp = document.getElementById('tabTotp');
 
         const cardTitle = document.getElementById('cardTitle');
@@ -151,13 +149,11 @@
 
         if (tabLogin) tabLogin.classList.remove('active');
         if (tabRegister) tabRegister.classList.remove('active');
-        if (tabRecover) tabRecover.classList.remove('active');
         if (tabTotp) tabTotp.classList.remove('active');
 
         loginForm.style.display = 'none';
         registerForm.style.display = 'none';
         totpForm.style.display = 'none';
-        recoverForm.style.display = 'none';
 
         if (mode === 'login') {
             tabLogin.classList.add('active');
@@ -175,11 +171,6 @@
             totpForm.style.display = 'block';
             cardTitle.innerText = 'Google Authenticator 2FA';
             cardSubtitle.innerText = 'Enter 6-digit code from your Authenticator App';
-        } else if (mode === 'recover') {
-            tabRecover.classList.add('active');
-            recoverForm.style.display = 'block';
-            cardTitle.innerText = 'Account Recovery';
-            cardSubtitle.innerText = 'Reset 2FA using Emergency Recovery Code';
         }
     }
 

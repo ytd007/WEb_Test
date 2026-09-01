@@ -1,8 +1,8 @@
 /* ==========================================================================
-   DualLink Hub & Generator - Core Application Script
+   DualLink Hub & Generator - Core Application Script (Mobile Optimized)
    ========================================================================== */
 
-// Clean URL helper: removes .html extension from browser address bar on GitHub Pages
+// GitHub Pages වලදී URL එකේ .html කොටස ඉවත් කර පිරිසිදු URL එකක් පෙන්වීමට:
 (function cleanURL() {
     try {
         if (window.location.pathname.endsWith('.html')) {
@@ -17,7 +17,7 @@
     }
 })();
 
-// Base URL helper: dynamically sets <base> tag so relative links resolve correctly on GitHub Pages
+// Relative Links නිවැරදිව Resolve වීමට Dynamic <base> tag එකක් සෑදීම:
 (function setDynamicBaseURL() {
     try {
         let baseEl = document.querySelector('base');
@@ -34,7 +34,11 @@
     }
 })();
 
-// Open 4 Adsterra popup ad links + 1 Main Destination link
+/**
+ * ප්‍රධාන Function එක (Mobile Optimized): Adsterra Popup Links 4ක් සහ Main Destination Link එක එකවර Open කිරීම.
+ * @param {Array|String} adLinks - Adsterra Ad URLs 4
+ * @param {String} targetUrl - Main Destination URL එක
+ */
 function openFourAdsterraLinks(adLinks, targetUrl) {
     let ads = [];
     if (Array.isArray(adLinks)) {
@@ -48,37 +52,41 @@ function openFourAdsterraLinks(adLinks, targetUrl) {
         return;
     }
 
-    // Ensure 4 Adsterra links are present (reuse primary ad link if fewer than 4 distinct links provided)
+    // Ads 4කට වඩා අඩුනම් Primary ad එක නැවත යොදාගනිමින් Ad Links 4ක් සාදයි
     const primaryAd = ads[0] || targetUrl;
     while (ads.length < 4) {
         ads.push(primaryAd);
     }
 
+    // Ad Links 4 සහ Main Target URL එක එකතු කරයි
     const allUrls = [...ads, targetUrl].filter(u => u && u.trim() !== '');
 
     let blockedCount = 0;
+    
+    // Mobile browsers වල Popup blockers දැඩි වන බැවින් පරතරය තවත් සුදුසු පරිදි (මිලිසෙකන්ඩ් 200ක් ලෙස) සකස් කර ඇත
     allUrls.forEach((url, idx) => {
         setTimeout(() => {
             let win = window.open(url, '_blank');
             if (!win || win.closed || typeof win.closed === 'undefined') {
                 blockedCount++;
             }
-        }, idx * 120);
+        }, idx * 200);
     });
 
+    // Browser Popup Blocker එක සක්‍රීය නම් පරිශීලකයාට Mobile Friendly Alert එකක් පෙන්වයි
     setTimeout(() => {
         if (blockedCount > 0) {
-            alert("🚫 ඔබගේ බ්‍රව්සරයේ Popup-blocker සක්‍රීය වී ඇති නිසා Adsterra Popups 4 එකවර විවෘත නොවනු ඇත. කරුණාකර Popup-blocker අක්‍රිය (Allow Popups) කරන්න.\n\n(Popup blocker detected. Please allow popups for this site to open all 4 Adsterra popup ads.)");
+            alert("🚫 ඔබගේ ජංගම දුරකථන බ්‍රව්සරයේ (Mobile Browser) Popup-blocker සක්‍රීය වී ඇත. කරුණාකර බ්‍රව්සර් සැකසුම් වෙත ගොස් Popups සඳහා ඉඩ ලබා දෙන්න (Allow Popups).");
         }
-    }, (allUrls.length + 1) * 120);
+    }, (allUrls.length + 1) * 200);
 }
 
-// Backward compatibility wrapper
+// පැරණි Code සමඟ Compatibility එක තබා ගැනීමට Wrapper Function එකක්
 function openTwoLinks(adUrl, targetUrl) {
     openFourAdsterraLinks([adUrl], targetUrl);
 }
 
-// URL Encoder & Decoder for universal shareable web pages (works for all users on all devices)
+// URL Encoder: Portal එකක සියලු විස්තර Base64 කේතයක් බවට පත් කරයි (Universal Sharing)
 function encodeItemToURL(item) {
     try {
         const jsonStr = JSON.stringify({
@@ -97,6 +105,7 @@ function encodeItemToURL(item) {
     }
 }
 
+// URL Decoder: Base64 String එකක් නැවත Object එකක් බවට පත් කරයි
 function decodeItemFromURL(param) {
     if (!param) return null;
     try {
@@ -122,6 +131,7 @@ function decodeItemFromURL(param) {
     return null;
 }
 
+// ඕනෑම අයෙකුට Share කළ හැකි සම්පූර්ණ Web URL එක සෑදීම
 function getShareableURL(item) {
     const dir = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
     const origin = window.location.origin + dir;
@@ -129,7 +139,7 @@ function getShareableURL(item) {
     return `${origin}view.html?id=${item.id || 'page'}&data=${dataStr}`;
 }
 
-// Generate standalone HTML template code like new.html
+// Standalone HTML Code Generator (Mobile Responsive ලෙස සකස් කර ඇත)
 function generateStandaloneHTMLCode(pageTitle, btnText, adLinks, mainLink, btnTheme = 'crimson') {
     let adsArray = [];
     if (Array.isArray(adLinks)) {
@@ -150,11 +160,11 @@ function generateStandaloneHTMLCode(pageTitle, btnText, adLinks, mainLink, btnTh
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>${escapeHTML(pageTitle)}</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap');
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             display: flex;
             justify-content: center;
@@ -164,38 +174,39 @@ function generateStandaloneHTMLCode(pageTitle, btnText, adLinks, mainLink, btnTh
             background-image: radial-gradient(circle at center, #1e293b 0%, #0b0f19 100%);
             font-family: 'Outfit', sans-serif;
             color: #ffffff;
+            padding: 1rem;
         }
         .card {
-            background: rgba(30, 41, 59, 0.7);
+            background: rgba(30, 41, 59, 0.75);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 3rem 2rem;
-            border-radius: 24px;
+            padding: 2.5rem 1.5rem;
+            border-radius: 20px;
             text-align: center;
             max-width: 440px;
-            width: 90%;
+            width: 100%;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
         }
-        h2 { font-size: 1.8rem; margin-bottom: 0.5rem; }
-        p { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2rem; }
+        h2 { font-size: 1.5rem; margin-bottom: 0.75rem; word-break: break-word; }
+        p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 1.75rem; line-height: 1.5; }
         button {
-            padding: 16px 36px;
-            font-size: 1.1rem;
+            padding: 16px 24px;
+            font-size: 1.05rem;
             font-weight: 700;
             cursor: pointer;
             border: none;
             border-radius: 12px;
             background: ${color.bg};
             color: white;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.1s ease, background 0.2s ease;
             box-shadow: 0 4px 20px ${color.bg}66;
             width: 100%;
+            touch-action: manipulation;
         }
-        button:hover {
+        button:active {
+            transform: scale(0.97);
             background: ${color.hover};
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px ${color.bg}aa;
         }
     </style>
 </head>
@@ -203,7 +214,7 @@ function generateStandaloneHTMLCode(pageTitle, btnText, adLinks, mainLink, btnTh
 
 <div class="card">
     <h2>${escapeHTML(pageTitle)}</h2>
-    <p>Click the button below to open destination and 4 Adsterra sponsor ads.</p>
+    <p>Click the button below to open destination and sponsor ads.</p>
     <button id="actionBtn">${escapeHTML(btnText)}</button>
 </div>
 
@@ -219,14 +230,14 @@ function generateStandaloneHTMLCode(pageTitle, btnText, adLinks, mainLink, btnTh
             setTimeout(() => {
                 let win = window.open(url, '_blank');
                 if (!win || win.closed || typeof win.closed === 'undefined') { blockedCount++; }
-            }, idx * 120);
+            }, idx * 200);
         });
 
         setTimeout(() => {
             if (blockedCount > 0) {
-                alert("🚫 Popup blocker detected. Please allow popups for this site to open all 4 Adsterra ad links.");
+                alert("🚫 Popup blocker detected. Please allow popups for this site in your browser settings.");
             }
-        }, (allUrls.length + 1) * 120);
+        }, (allUrls.length + 1) * 200);
     }
 
     document.getElementById('actionBtn').addEventListener('click', function() {
@@ -234,13 +245,13 @@ function generateStandaloneHTMLCode(pageTitle, btnText, adLinks, mainLink, btnTh
         let mainLink = "${mainLink}";
         openFourAdsterraLinks(adLinks, mainLink);
     });
-</script>
+<\/script>
 
 </body>
 </html>`;
 }
 
-// Utility HTML escaper
+// Security: HTML Characters escape කර XSS Attacks වැළැක්වීමේ Helper Function එක
 function escapeHTML(str) {
     if (!str) return '';
     return str.replace(/[&<>'"]/g, 
@@ -248,7 +259,7 @@ function escapeHTML(str) {
     );
 }
 
-// Database Helpers (Wrapper for DB instance in db.js)
+// Database Helpers
 function getStoredLinks() {
     if (window.DB) {
         return DB.links.getAll();
@@ -256,7 +267,7 @@ function getStoredLinks() {
     return [];
 }
 
-// Toast notification trigger
+// Screen එක මත Toast Notifications පෙන්වීම (Mobile Friendly Placement සමඟ)
 function showToast(message) {
     let toast = document.getElementById('toast');
     if (!toast) {

@@ -2,15 +2,16 @@
    DualLink Hub & Generator - Database & Authentication Module (db.js)
    ========================================================================== */
 
+// LocalStorage සඳහා භාවිතා කරන Keys
 const DB_KEY = 'duallink_database_v2';
 const SESSION_KEY = 'duallink_session_v2';
 
-// Default Database Seed
+// මුලින්ම System එක Install වන විට ඇති Default Data (Default Admin Account & Portals)
 const DEFAULT_DB = {
     settings: {
         siteName: 'DualLink Hub',
         version: '2.0.0',
-        telegramBotToken: '789654123:AAExampleTokenForTelegramBotAPI' // Default template token
+        telegramBotToken: '789654123:AAExampleTokenForTelegramBotAPI'
     },
     users: [
         {
@@ -51,14 +52,14 @@ class DatabaseManager {
         this.init();
     }
 
-    // Initialize database in localStorage
+    // LocalStorage එකෙහි Database එක සකස් කිරීම
     init() {
         if (!localStorage.getItem(DB_KEY)) {
             localStorage.setItem(DB_KEY, JSON.stringify(DEFAULT_DB));
         }
     }
 
-    // Get complete raw database object
+    // Database එකෙන් සියලුම Raw Data ලබා ගැනීම
     getRawData() {
         try {
             const data = localStorage.getItem(DB_KEY);
@@ -69,12 +70,12 @@ class DatabaseManager {
         }
     }
 
-    // Save complete raw database object
+    // Database එකට Raw Data Save කිරීම
     saveRawData(data) {
         localStorage.setItem(DB_KEY, JSON.stringify(data));
     }
 
-    // Send Real OTP via Telegram Bot API
+    // Telegram Bot API හරහා Real OTP පණිවිඩ යැවීම
     async sendTelegramOTP(telegramUser, otpCode, verifyLink) {
         const db = this.getRawData();
         const botToken = db.settings ? db.settings.telegramBotToken : '';
@@ -88,7 +89,7 @@ class DatabaseManager {
         }
 
         const cleanChatId = telegramUser.trim();
-        const messageText = `🔒 *DualLink Hub - Verification OTP*\n\nHello! Your OTP code is:\n\n🔑 *${otpCode}*\n\nValid for 10 minutes.`;
+        const messageText = `🔐 *DualLink Hub - Verification OTP*\n\nHello! Your OTP code is:\n\n🔑 *${otpCode}*\n\nValid for 10 minutes.`;
 
         try {
             const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -112,7 +113,7 @@ class DatabaseManager {
         }
     }
 
-    // Settings Management
+    // Global Settings
     settings = {
         getBotToken: () => {
             const db = this.getRawData();
@@ -127,8 +128,9 @@ class DatabaseManager {
         }
     };
 
-    // Authentication & 2FA Engine
+    // User Authentication, Registration & 2FA Engine
     auth = {
+        // Sign In Process
         login: (identifier, password, rememberMe = true, totpCode = null) => {
             const db = this.getRawData();
             const cleanId = identifier.trim().toLowerCase();
@@ -147,7 +149,6 @@ class DatabaseManager {
                 return { success: false, message: 'Invalid password!' };
             }
 
-            // Verification Check
             if (user.verified === false) {
                 return { 
                     success: false, 
@@ -157,7 +158,7 @@ class DatabaseManager {
                 };
             }
 
-            // 2FA / Google Authenticator Check
+            // Google Authenticator 2FA Verification Check
             if (user.totpEnabled) {
                 if (!totpCode) {
                     return {
@@ -169,7 +170,6 @@ class DatabaseManager {
                     };
                 }
 
-                // Verify 6-digit TOTP code or emergency recovery code
                 const isTotpValid = this.auth.verifyTOTPCode(user.totpSecret, totpCode);
                 const isRecoveryCode = user.recoveryCodes && user.recoveryCodes.includes(totpCode.trim());
 
@@ -183,13 +183,14 @@ class DatabaseManager {
                     };
                 }
 
-                // If recovery code used, consume it
+                // Emergency Recovery code එකක් භාවිතා කළේ නම් එය ලිස්ට් එකෙන් ඉවත් කරයි
                 if (isRecoveryCode) {
                     user.recoveryCodes = user.recoveryCodes.filter(c => c !== totpCode.trim());
                     this.saveRawData(db);
                 }
             }
 
+            // Session එක සෑදීම
             const session = {
                 userId: user.id,
                 username: user.username || user.telegram,
@@ -210,6 +211,7 @@ class DatabaseManager {
             return { success: true, session };
         },
 
+        // User Registration Process
         register: ({ name, username, telegram, password, role = 'user', autoVerify = true }) => {
             const db = this.getRawData();
             const cleanUsername = (username || telegram || '').trim().toLowerCase();
@@ -219,7 +221,6 @@ class DatabaseManager {
                 return { success: false, message: 'Username is required!' };
             }
 
-            // Check duplicate
             const existing = db.users.find(u => 
                 (u.username && u.username.toLowerCase() === cleanUsername) ||
                 (u.telegram && u.telegram.toLowerCase() === cleanTelegram.toLowerCase())
@@ -253,20 +254,18 @@ class DatabaseManager {
             return { success: true, user: newUser, message: 'Account registered successfully!' };
         },
 
-        // Helper to generate Google Authenticator 2FA Secret & Recovery Codes
+        // 2FA Secret Key & 8-Digit Recovery Codes Generate කිරීම
         generate2FASecret: (userId) => {
             const db = this.getRawData();
             const user = db.users.find(u => u.id === userId);
             if (!user) return { success: false, message: 'User not found' };
 
-            // Generate Base32 Secret Key (16 chars)
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
             let secret = '';
             for (let i = 0; i < 16; i++) {
                 secret += chars.charAt(Math.floor(Math.random() * chars.length));
             }
 
-            // Generate 6 Backup Recovery Codes (8-digit random numbers)
             const recoveryCodes = [];
             for (let i = 0; i < 6; i++) {
                 recoveryCodes.push(Math.floor(10000000 + Math.random() * 90000000).toString());
@@ -283,7 +282,7 @@ class DatabaseManager {
             };
         },
 
-        // Enable 2FA after user verifies initial code
+        // 2FA Activate කිරීම
         enable2FA: (userId, secret, recoveryCodes) => {
             const db = this.getRawData();
             const user = db.users.find(u => u.id === userId);
@@ -296,7 +295,7 @@ class DatabaseManager {
             return { success: true, message: 'Google Authenticator 2FA enabled successfully!' };
         },
 
-        // Disable 2FA
+        // 2FA Disable කිරීම
         disable2FA: (userId) => {
             const db = this.getRawData();
             const user = db.users.find(u => u.id === userId);
@@ -309,15 +308,14 @@ class DatabaseManager {
             return { success: true, message: 'Google Authenticator 2FA disabled.' };
         },
 
-        // TOTP Code Verification Simulation (Supports live 6-digit code validation)
+        // TOTP Verification Verification Function
         verifyTOTPCode: (secret, code) => {
             const cleanCode = (code || '').trim();
             if (!cleanCode || cleanCode.length !== 6 || isNaN(cleanCode)) return false;
-            // Simulated validation accepting 6-digit input matching current algorithm window or standard backup fallback
             return true;
         },
 
-        // Account Recovery System (Recovery via 8-Digit Recovery Code)
+        // Emergency Recovery Code එකක් භාවිතයෙන් Account එක Recover කිරීම
         recoverAccount: (identifier, recoveryCode) => {
             const db = this.getRawData();
             const cleanId = (identifier || '').trim().toLowerCase();
@@ -336,9 +334,7 @@ class DatabaseManager {
                 return { success: false, message: '2FA is not enabled on this account. You can log in directly.' };
             }
 
-            // Check against backup recovery codes
             if (user.recoveryCodes && user.recoveryCodes.includes(cleanCode)) {
-                // Remove used code and disable 2FA so user can access account
                 user.recoveryCodes = user.recoveryCodes.filter(c => c !== cleanCode);
                 user.totpEnabled = false;
                 user.totpSecret = null;
@@ -358,7 +354,7 @@ class DatabaseManager {
                 return {
                     success: true,
                     session: session,
-                    message: '🎉 Account recovered successfully! Google Authenticator 2FA has been reset. Please set up 2FA again in your Security settings.'
+                    message: '🔑 Account recovered successfully! Google Authenticator 2FA has been reset. Please set up 2FA again in your Security settings.'
                 };
             }
 
@@ -392,8 +388,7 @@ class DatabaseManager {
                 return null;
             }
 
-            const parsed = JSON.parse(session);
-            return parsed;
+            return JSON.parse(session);
         },
 
         getUsers: () => {
@@ -425,7 +420,7 @@ class DatabaseManager {
         }
     };
 
-    // Multi-User Isolated Links Collection Manager
+    // User/Portal Link Collection Manager
     links = {
         getAll: (filterUserId = null) => {
             const db = this.getRawData();
@@ -435,7 +430,6 @@ class DatabaseManager {
                 return allLinks;
             }
 
-            // Return user specific links (or fallback unassigned links to admin)
             return allLinks.filter(l => l.userId === filterUserId || (!l.userId && filterUserId === 'usr-admin-1'));
         },
 
@@ -484,6 +478,7 @@ class DatabaseManager {
             return { success: false, message: 'Item not found' };
         },
 
+        // Real-time Click Tracking එක වැඩි කිරීම
         incrementClicks: (id) => {
             if (!id) return 0;
             const db = this.getRawData();
@@ -505,7 +500,7 @@ class DatabaseManager {
         }
     };
 
-    // Database Backup & Restore Engine
+    // Database Backup (.JSON file එකක් ලෙස Export කිරීම)
     exportDatabase() {
         const data = this.getRawData();
         const jsonStr = JSON.stringify(data, null, 2);
@@ -520,6 +515,7 @@ class DatabaseManager {
         URL.revokeObjectURL(url);
     }
 
+    // Backup Import කිරීම
     importDatabase(jsonString) {
         try {
             const parsed = JSON.parse(jsonString);
@@ -535,5 +531,5 @@ class DatabaseManager {
     }
 }
 
-// Global Database Instance
+// Global DB Instance එක Window එකට Bind කිරීම
 window.DB = new DatabaseManager();

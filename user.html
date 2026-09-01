@@ -5,16 +5,384 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard - DualLink Hub</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- QRCode generator library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-</head>
-<body>
 
-    <!-- User Navigation Bar -->
+    <!-- USER.HTML ONLY: responsive/mobile fix. Does not modify styles.css or other pages. -->
+    <style id="user-mobile-fix">
+        html, body.user-dashboard-page {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            overflow-x: hidden !important;
+        }
+
+        .user-dashboard-page *,
+        .user-dashboard-page *::before,
+        .user-dashboard-page *::after {
+            box-sizing: border-box;
+        }
+
+        .user-dashboard-page .navbar,
+        .user-dashboard-page .main-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+        }
+
+        .user-dashboard-page .main-container {
+            overflow: visible !important;
+        }
+
+        .user-dashboard-page .admin-grid {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+        }
+
+        .user-dashboard-page .admin-grid > *,
+        .user-dashboard-page .panel-card {
+            min-width: 0 !important;
+            max-width: 100% !important;
+        }
+
+        .user-dashboard-page .panel-card {
+            overflow: hidden !important;
+        }
+
+        .user-dashboard-page img,
+        .user-dashboard-page canvas,
+        .user-dashboard-page video,
+        .user-dashboard-page iframe {
+            max-width: 100% !important;
+        }
+
+        .user-dashboard-page input,
+        .user-dashboard-page select,
+        .user-dashboard-page textarea,
+        .user-dashboard-page button {
+            max-width: 100%;
+        }
+
+        @media screen and (max-width: 900px) {
+            .user-dashboard-page .admin-grid {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+            }
+
+            .user-dashboard-page .navbar {
+                flex-wrap: wrap !important;
+            }
+        }
+
+        @media screen and (max-width: 700px) {
+            .user-dashboard-page .navbar {
+                padding: 10px 12px !important;
+                gap: 8px !important;
+            }
+
+            .user-dashboard-page .brand {
+                min-width: 0 !important;
+                flex: 1 1 auto !important;
+                max-width: calc(100% - 105px) !important;
+            }
+
+            .user-dashboard-page .brand span {
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                white-space: nowrap !important;
+            }
+
+            .user-dashboard-page .nav-links {
+                flex: 0 0 auto !important;
+                min-width: 0 !important;
+            }
+
+            .user-dashboard-page .nav-btn {
+                max-width: 120px !important;
+                min-height: 40px !important;
+                padding: 8px 10px !important;
+                font-size: 12px !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+
+            .user-dashboard-page .main-container {
+                padding: 16px 10px 30px !important;
+            }
+
+            .user-dashboard-page .page-intro h2 {
+                font-size: 1.35rem !important;
+                line-height: 1.3 !important;
+                overflow-wrap: anywhere;
+            }
+
+            .user-dashboard-page .page-intro p {
+                font-size: 0.82rem !important;
+                line-height: 1.55 !important;
+            }
+
+            .user-dashboard-page .panel-card {
+                width: 100% !important;
+                padding: 14px !important;
+                border-radius: 16px !important;
+            }
+
+            .user-dashboard-page .form-group input {
+                width: 100% !important;
+                min-width: 0 !important;
+                min-height: 44px !important;
+                font-size: 16px !important; /* prevents iOS zoom */
+            }
+
+            .user-dashboard-page .form-actions {
+                width: 100% !important;
+                flex-direction: column !important;
+            }
+
+            .user-dashboard-page .form-actions .btn {
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+
+            .user-dashboard-page .auth-tabs {
+                width: 100% !important;
+                display: grid !important;
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+                gap: 4px !important;
+            }
+
+            .user-dashboard-page .auth-tab {
+                min-width: 0 !important;
+                width: 100% !important;
+                min-height: 44px !important;
+                padding: 7px 3px !important;
+                font-size: 11px !important;
+                line-height: 1.2 !important;
+                text-align: center !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+
+            .user-dashboard-page #previewContainer {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 14px !important;
+            }
+
+            .user-dashboard-page #previewContainer .btn {
+                width: 100% !important;
+                max-width: 280px !important;
+            }
+
+            .user-dashboard-page #qrcode {
+                max-width: 100% !important;
+                padding: 8px !important;
+            }
+
+            .user-dashboard-page #qrcode img,
+            .user-dashboard-page #qrcode canvas {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+
+            .user-dashboard-page #secretKeyText {
+                overflow-wrap: anywhere !important;
+                word-break: break-all !important;
+            }
+
+            .user-dashboard-page .totp-verify-row {
+                width: 100% !important;
+                flex-direction: column !important;
+            }
+
+            .user-dashboard-page #verifyTotpInput,
+            .user-dashboard-page .totp-verify-row button {
+                width: 100% !important;
+                min-width: 0 !important;
+                flex: none !important;
+            }
+
+            .user-dashboard-page #totpEnabledBox > div {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+
+            .user-dashboard-page #totpEnabledBox .btn {
+                width: 100% !important;
+            }
+
+            .user-dashboard-page .recovery-code-grid {
+                width: 100% !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 6px !important;
+            }
+
+            .user-dashboard-page .recovery-code-chip {
+                min-width: 0 !important;
+                overflow-wrap: anywhere !important;
+                word-break: break-all !important;
+                text-align: center !important;
+            }
+
+            /* Saved portals: real mobile cards instead of a squeezed table */
+            .user-dashboard-page .table-wrapper {
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow-x: visible !important;
+                border: 0 !important;
+            }
+
+            .user-dashboard-page .table-wrapper table,
+            .user-dashboard-page .table-wrapper tbody {
+                display: block !important;
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+
+            .user-dashboard-page .table-wrapper thead {
+                display: none !important;
+            }
+
+            .user-dashboard-page .table-wrapper tbody tr {
+                display: block !important;
+                width: 100% !important;
+                margin: 0 0 10px !important;
+                padding: 10px !important;
+                border: 1px solid var(--border-light) !important;
+                border-radius: 14px !important;
+                background: rgba(9, 13, 22, 0.55) !important;
+            }
+
+            .user-dashboard-page .table-wrapper tbody td {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                gap: 10px !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                padding: 8px 0 !important;
+                border-bottom: 1px solid rgba(255,255,255,.06) !important;
+                text-align: right !important;
+                white-space: normal !important;
+                overflow-wrap: anywhere !important;
+            }
+
+            .user-dashboard-page .table-wrapper tbody td::before {
+                flex: 0 0 auto !important;
+                color: var(--text-muted) !important;
+                font-size: 10px !important;
+                font-weight: 700 !important;
+                text-transform: uppercase !important;
+                letter-spacing: .4px !important;
+            }
+
+            .user-dashboard-page .table-wrapper tbody td:nth-child(1)::before { content: "Title"; }
+            .user-dashboard-page .table-wrapper tbody td:nth-child(2)::before { content: "Theme"; }
+            .user-dashboard-page .table-wrapper tbody td:nth-child(3)::before { content: "Clicks"; }
+            .user-dashboard-page .table-wrapper tbody td:nth-child(4)::before { content: "Created"; }
+
+            .user-dashboard-page .table-wrapper tbody td:nth-child(5) {
+                display: block !important;
+                text-align: left !important;
+                border-bottom: 0 !important;
+            }
+
+            .user-dashboard-page .table-wrapper tbody td:nth-child(5)::before {
+                display: block !important;
+                margin-bottom: 7px !important;
+                content: "Actions" !important;
+            }
+
+            .user-dashboard-page .action-btn-group {
+                display: flex !important;
+                width: 100% !important;
+                gap: 6px !important;
+                flex-wrap: wrap !important;
+            }
+
+            .user-dashboard-page .tbl-btn {
+                flex: 1 1 0 !important;
+                min-width: 0 !important;
+                min-height: 38px !important;
+                padding: 7px 6px !important;
+                justify-content: center !important;
+                white-space: nowrap !important;
+            }
+
+            .user-dashboard-page .table-wrapper td[colspan] {
+                display: block !important;
+                text-align: center !important;
+            }
+
+            .user-dashboard-page .table-wrapper td[colspan]::before {
+                display: none !important;
+            }
+
+            .user-dashboard-page .toast {
+                left: 10px !important;
+                right: 10px !important;
+                width: auto !important;
+                max-width: none !important;
+                text-align: center !important;
+            }
+        }
+
+        @media screen and (max-width: 420px) {
+            .user-dashboard-page .brand {
+                max-width: calc(100% - 155px) !important;
+                min-width: 0 !important;
+            }
+
+            .user-dashboard-page .brand-icon {
+                width: 32px !important;
+                height: 32px !important;
+            }
+
+            .user-dashboard-page .nav-links {
+                flex: 0 0 auto !important;
+                width: auto !important;
+                min-width: 0 !important;
+            }
+
+            .user-dashboard-page .nav-btn {
+                width: auto !important;
+                max-width: none !important;
+                min-width: 0 !important;
+                white-space: nowrap !important;
+                overflow: visible !important;
+                text-overflow: clip !important;
+                font-size: 12px !important;
+                padding: 8px 10px !important;
+            }
+
+            .user-dashboard-page .auth-tab {
+                font-size: 10px !important;
+            }
+
+            .user-dashboard-page .panel-card {
+                padding: 12px !important;
+            }
+
+            .user-dashboard-page .action-btn-group {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+            }
+
+            .user-dashboard-page .action-btn-group .tbl-btn:last-child {
+                grid-column: 1 / -1;
+            }
+        }
+    </style>
+
+</head>
+<body class="user-dashboard-page">
+
     <nav class="navbar">
         <a href="index.html" class="brand" title="Go to Home Page">
             <div class="brand-icon">⚡</div>
-            <span>DualLink User Dashboard</span>
+            <span>DualLink Dashboard</span>
         </a>
         <div class="nav-links">
             <button onclick="DB.auth.logout()" class="nav-btn nav-btn-secondary" style="color: #fca5a5; border-color: rgba(239,68,68,0.3);">
@@ -23,21 +391,17 @@
         </div>
     </nav>
 
-    <!-- Main Container -->
     <main class="main-container">
 
-        <!-- Page Header -->
-        <div style="margin-bottom: 2rem;">
+        <div class="page-intro" style="margin-bottom: 1.5rem;">
             <h2 style="font-size: 1.8rem; margin-bottom: 0.3rem;">Personal Web Portal Builder</h2>
             <p style="color: var(--text-secondary); font-size: 0.95rem;">
                 ඔබගේ පෞද්ගලික 4-Adsterra Dual Web Pages සාදා ගන්න, කළමනාකරණය කරන්න, සහ Google Authenticator 2FA ආරක්ෂාව සක්‍රීය කරන්න.
             </p>
         </div>
 
-        <!-- 2 Column Layout -->
         <div class="admin-grid">
             
-            <!-- Left Form Panel -->
             <div class="panel-card">
                 <h3 style="margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
                     <span>🛠️</span> Page Configuration
@@ -91,28 +455,25 @@
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
-                        <button type="button" id="saveBtn" onclick="saveUserLink()" class="btn btn-indigo" style="flex: 1;">
+                    <div class="form-actions" style="display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap;">
+                        <button type="button" id="saveBtn" onclick="saveUserLink()" class="btn btn-indigo" style="flex: 1; min-width: 140px;">
                             💾 Save Portal
                         </button>
-                        <button type="button" id="cancelEditBtn" onclick="resetForm()" class="btn btn-secondary" style="display: none;">
+                        <button type="button" id="cancelEditBtn" onclick="resetForm()" class="btn btn-secondary" style="display: none; flex: 1; min-width: 100px;">
                             Cancel
                         </button>
                     </div>
                 </form>
             </div>
 
-            <!-- Right Panel: Tabs for Portals, Preview & Security -->
-            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div style="display: flex; flex-direction: column; gap: 1.5rem; width: 100%;">
                 
-                <!-- Panel Tabs -->
                 <div class="auth-tabs" style="margin-bottom: 0;">
                     <div class="auth-tab active" id="tabPortals" onclick="switchUserTab('portals')">📁 My Portals</div>
                     <div class="auth-tab" id="tabPreview" onclick="switchUserTab('preview')">👁️ Live Preview</div>
                     <div class="auth-tab" id="tabSecurity" onclick="switchUserTab('security')">🛡️ Security & 2FA</div>
                 </div>
 
-                <!-- VIEW 1: MY PORTALS TABLE -->
                 <div id="viewPortals" class="panel-card">
                     <h3 style="margin-bottom: 1rem;">Saved Portals (<span id="portalCount">0</span>)</h3>
                     
@@ -128,40 +489,34 @@
                                 </tr>
                             </thead>
                             <tbody id="userLinkTableBody">
-                                <!-- Populated dynamically -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- VIEW 2: LIVE PREVIEW -->
                 <div id="viewPreview" class="panel-card" style="display: none;">
                     <h3 style="margin-bottom: 1rem;">Live Component Preview</h3>
                     <div id="previewContainer" style="padding: 1.5rem; background: rgba(0,0,0,0.3); border-radius: var(--radius-md); border: 1px solid var(--border-light); text-align: center;">
-                        <!-- Live preview rendered here -->
-                    </div>
+                        </div>
                 </div>
 
-                <!-- VIEW 3: SECURITY & GOOGLE AUTHENTICATOR -->
                 <div id="viewSecurity" class="panel-card" style="display: none;">
                     <h3>🛡️ Security & Google Authenticator</h3>
                     <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1.25rem;">
                         Google Authenticator 2FA ආරක්ෂාව සක්‍රීය කර ඔබගේ Account එක සුරක්ෂිත කරගන්න.
                     </p>
 
-                    <!-- 2FA Status Banner -->
                     <div id="totpStatusBanner" style="padding: 0.85rem 1rem; border-radius: var(--radius-md); font-size: 0.88rem; margin-bottom: 1.25rem; background: rgba(255,255,255,0.04); border: 1px solid var(--border-light);">
                         Status: <strong id="totpStatusText">Loading...</strong>
                     </div>
 
-                    <!-- 2FA Setup Container -->
                     <div id="totpSetupBox" class="totp-box" style="display: none;">
                         <h4 style="margin-bottom: 0.5rem; color: #a5b4fc;">Step 1: Scan QR Code or Copy Secret Key</h4>
                         <p style="font-size: 0.82rem; color: var(--text-muted);">Open Google Authenticator app on your phone and scan QR code:</p>
                         
                         <div style="display: flex; flex-direction: column; align-items: center; margin: 1rem 0;">
                             <div id="qrcode" style="background: white; padding: 12px; border-radius: 8px; margin-bottom: 0.75rem;"></div>
-                            <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); word-break: break-all; text-align: center;">
                                 Secret Key: <code id="secretKeyText" style="color: #67e8f9; font-weight: bold; letter-spacing: 1px;">-</code>
                             </div>
                         </div>
@@ -172,21 +527,19 @@
                         </p>
 
                         <div id="recoveryCodesGrid" class="recovery-code-grid">
-                            <!-- Recovery codes -->
-                        </div>
+                            </div>
 
                         <div style="margin-top: 1.25rem;">
-                            <label for="verifyTotpInput" style="font-size: 0.85rem; color: var(--text-secondary);">Step 3: Enter 6-digit Code from Authenticator app to Activate:</label>
-                            <div style="display: flex; gap: 0.5rem; margin-top: 0.4rem;">
-                                <input type="text" id="verifyTotpInput" placeholder="e.g. 123456" maxlength="6" style="letter-spacing: 2px; text-align: center; font-weight: bold;">
-                                <button type="button" onclick="confirmEnable2FA()" class="btn btn-emerald">Activate 2FA</button>
+                            <label for="verifyTotpInput" style="font-size: 0.85rem; color: var(--text-secondary); display: block; margin-bottom: 0.4rem;">Step 3: Enter 6-digit Code from Authenticator app to Activate:</label>
+                            <div class="totp-verify-row" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <input type="text" id="verifyTotpInput" placeholder="e.g. 123456" maxlength="6" style="letter-spacing: 2px; text-align: center; font-weight: bold; flex: 1; min-width: 130px;">
+                                <button type="button" onclick="confirmEnable2FA()" class="btn btn-emerald" style="flex: 1; min-width: 130px;">Activate 2FA</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 2FA Enabled Box -->
                     <div id="totpEnabledBox" class="totp-box" style="display: none; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.08);">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                             <div>
                                 <h4 style="color: #6ee7b7; margin-bottom: 0.25rem;">✅ Google Authenticator 2FA Active</h4>
                                 <p style="font-size: 0.82rem; color: var(--text-secondary);">Your account is protected with 2FA.</p>
@@ -197,7 +550,6 @@
                         </div>
                     </div>
 
-                    <!-- Password Update Box -->
                     <div style="margin-top: 2rem; border-top: 1px solid var(--border-light); padding-top: 1.5rem;">
                         <h4>Change Password</h4>
                         <form onsubmit="handleUserPasswordUpdate(event)" style="margin-top: 1rem;">
@@ -205,7 +557,7 @@
                                 <label for="newPass">New Password</label>
                                 <input type="password" id="newPass" placeholder="Enter new password" required>
                             </div>
-                            <button type="submit" class="btn btn-indigo">Update Password</button>
+                            <button type="submit" class="btn btn-indigo" style="width: 100%;">Update Password</button>
                         </form>
                     </div>
                 </div>
@@ -215,7 +567,6 @@
 
     </main>
 
-    <!-- Toast Notification -->
     <div id="toast" class="toast">Notification Message</div>
 
     <script src="db.js"></script>
@@ -225,7 +576,7 @@
         let selectedTheme = 'crimson';
         let temp2FASetup = null;
 
-        // Theme picker selection
+        // Button Color Theme Picker එක ක්ලික් කිරීම පාලනය කිරීම
         document.querySelectorAll('.color-opt').forEach(opt => {
             opt.addEventListener('click', function() {
                 document.querySelectorAll('.color-opt').forEach(o => o.classList.remove('active'));
@@ -235,11 +586,12 @@
             });
         });
 
-        // Form change listeners
+        // Form එකේ Input වෙනස් වන විට Preview එක Live Update කිරීම
         document.querySelectorAll('#userLinkForm input').forEach(input => {
             input.addEventListener('input', updatePreview);
         });
 
+        // Dashboard Tabs (Portals / Preview / Security) මාරු කිරීම
         function switchUserTab(tab) {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             document.getElementById('viewPortals').style.display = 'none';
@@ -261,19 +613,21 @@
             }
         }
 
+        // Live Button Preview එක පෙන්වන Function එක
         function updatePreview() {
             const title = document.getElementById('pageTitle').value.trim() || 'My Direct Access Portal';
             const btnText = document.getElementById('btnText').value.trim() || 'Launch Video';
             const container = document.getElementById('previewContainer');
 
             container.innerHTML = `
-                <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem;">${escapeHTML(title)}</div>
+                <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem; word-break: break-word;">${escapeHTML(title)}</div>
                 <button class="btn btn-${selectedTheme} btn-block" style="margin: 0 auto; max-width: 280px;">
                     🚀 ${escapeHTML(btnText)}
                 </button>
             `;
         }
 
+        // නව Portal එකක් සාදා ගැනීම හෝ පවතින Portal එකක් Edit කර Save කිරීම
         function saveUserLink() {
             const id = document.getElementById('editItemId').value;
             const title = document.getElementById('pageTitle').value.trim();
@@ -314,6 +668,7 @@
             switchUserTab('portals');
         }
 
+        // පරිශීලකයා සෑදූ Portals සියල්ල Table එකක Render කිරීම
         function renderUserTable() {
             if (!currentSession) return;
             const userLinks = DB.links.getAll(currentSession.userId);
@@ -342,6 +697,7 @@
             `).join('');
         }
 
+        // Portal එකක් Edit කිරීමට Form එකට Load කිරීම
         function editUserLink(id) {
             const item = DB.links.getById(id);
             if (!item) return;
@@ -365,6 +721,7 @@
             updatePreview();
         }
 
+        // Portal එකක් Delete කිරීම
         function deleteUserLink(id) {
             if (confirm("Are you sure you want to delete this portal?")) {
                 DB.links.delete(id);
@@ -373,6 +730,7 @@
             }
         }
 
+        // Form එක මුල් තත්වයට පත් කිරීම (Reset)
         function resetForm() {
             document.getElementById('editItemId').value = '';
             document.getElementById('userLinkForm').reset();
@@ -382,6 +740,7 @@
             updatePreview();
         }
 
+        // Portal එකට අදාළ Share Link එක Clipboard එකට Copy කිරීම
         function copyLinkShare(id) {
             const item = DB.links.getById(id);
             if (!item) return;
@@ -392,6 +751,7 @@
         }
 
         // --- 2FA SECURITY LOGIC ---
+        // Security Tab එක Load වීම සහ Status එක පෙන්වීම
         function loadSecurityTab() {
             const db = DB.getRawData();
             const user = db.users.find(u => u.id === currentSession.userId);
@@ -413,13 +773,14 @@
             }
         }
 
+        // 2FA Setup එක ආරම්භ කර QR Code & Recovery Codes සෑදීම
         function init2FASetup() {
             temp2FASetup = DB.auth.generate2FASecret(currentSession.userId);
             if (!temp2FASetup.success) return;
 
             document.getElementById('secretKeyText').innerText = temp2FASetup.secret;
 
-            // Render QR Code safely
+            // QR Code එක Screen එක මත Render කිරීම
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = '';
             if (typeof QRCode !== 'undefined') {
@@ -432,11 +793,12 @@
                 qrContainer.innerHTML = `<div style="color:#000; font-weight:bold; font-size:0.8rem; padding:0.5rem;">Scan Key Manually</div>`;
             }
 
-            // Render Recovery Codes
+            // Emergency Recovery Codes පෙන්වීම
             const grid = document.getElementById('recoveryCodesGrid');
             grid.innerHTML = temp2FASetup.recoveryCodes.map(code => `<div class="recovery-code-chip">${code}</div>`).join('');
         }
 
+        // 2FA සක්‍රීය කිරීම තහවුරු කිරීම
         function confirmEnable2FA() {
             const code = document.getElementById('verifyTotpInput').value.trim();
             if (!code || code.length !== 6) {
@@ -451,6 +813,7 @@
             }
         }
 
+        // 2FA අක්‍රිය කිරීම
         function disable2FA() {
             if (confirm("Are you sure you want to disable Google Authenticator 2FA? Your account will no longer require 2FA to log in.")) {
                 DB.auth.disable2FA(currentSession.userId);
@@ -459,6 +822,7 @@
             }
         }
 
+        // Password එක Update කිරීම
         function handleUserPasswordUpdate(e) {
             e.preventDefault();
             const newP = document.getElementById('newPass').value;
@@ -469,10 +833,13 @@
             }
         }
 
+        // Page එක Load වන විට පරිශීලකයා Login වී ඇත්දැයි පරීක්ෂා කිරීම
         document.addEventListener('DOMContentLoaded', () => {
             currentSession = DB.auth.requireAuth();
             if (currentSession) {
-                document.getElementById('sessionUser').innerText = currentSession.name || currentSession.username;
+                const rawUsername = currentSession.name || currentSession.username || 'User';
+                const cleanUsername = String(rawUsername).trim();
+                document.getElementById('sessionUser').innerText = cleanUsername;
                 renderUserTable();
                 updatePreview();
             }
